@@ -1,13 +1,14 @@
 {
   "name": "d4tech-hub",
-  "version": "4.2.1",
-  "description": "D4Tech Hub v4.2.1 — Super-App 21 Tools Kreator, AI & Siber Gratis (PWA + Deep-Link + Multi-GPU)",
+  "version": "4.3.0",
+  "description": "D4Tech Hub v4.3.0 — Super-App 21 Tools Kreator, AI & Siber Gratis (PWA + Deep-Link + SEO per Tool + Redis/Sentry opsional)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
   "dependencies": {
+    "@sentry/node": "^8.0.0",
     "express": "^4.21.2"
   },
   "engines": {

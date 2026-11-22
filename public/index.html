@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#101828" />
+  <!-- SEO: meta description/OG/JSON-LD di-inject server per ?tool=<slug> (src/seo.js) -->
   <title>D4Tech Hub — Direktori 21 Perangkat Kreator, AI &amp; Siber</title>
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icon-192.png" />
@@ -122,6 +123,13 @@
               <button type="button" class="quick-tool-pill" data-tool-target="osint">Pencari Username OSINT</button>
               <button type="button" class="quick-tool-pill" data-tool-target="pixelvault">Pixel Vault Steganografi</button>
               <button type="button" class="quick-tool-pill" data-tool-target="cyberutil">Scanner Link &amp; QR Logo</button>
+            </div>
+          </div>
+
+          <div class="sidebar-group">
+            <div class="sidebar-group-label">Sistem &amp; Status</div>
+            <div class="sidebar-nav-list">
+              <button type="button" class="quick-tool-pill" data-tool-target="status">Status Server</button>
             </div>
           </div>
         </div>
@@ -786,6 +794,35 @@
             </div>
           </form>
         </details>
+      </section>
+
+      <!-- =================================================================
+           STATUS SERVER: dashboard kesehatan pool gateway gratis
+           ================================================================= -->
+      <section class="view" id="view-status">
+        <div class="hero-header">
+          <h1>Status Server</h1>
+          <p>Pantau kesehatan jaringan pool gateway gratis secara real-time. Sistem otomatis failover ke gateway lain bila salah satu server penuh atau mati.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <div class="step-section">
+            <div class="step-label-row">
+              <div class="step-title">
+                <span class="step-num">✓</span>
+                <label>Status Pool Gateway</label>
+              </div>
+              <button type="button" class="btn btn-secondary" id="btnRefreshPoolStatus">Periksa Ulang</button>
+            </div>
+            <div id="poolStatusSummary" class="result-card-clean" style="text-align:center; color:var(--text-muted); padding:1rem;">
+              Memeriksa status gateway...
+            </div>
+            <div id="poolStatusGrid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0.75rem; margin-top:0.75rem;"></div>
+            <p style="color:var(--text-muted); font-size:0.82rem; margin-top:0.75rem;">
+              Status diperbarui otomatis tiap 30 detik. Data di-cache 30 detik agar tidak membebani server pool.
+            </p>
+          </div>
+        </div>
       </section>
 
       <!-- =================================================================
@@ -2011,8 +2048,9 @@ Hal-hal baik yang datangnya belakangan</textarea>
   </div>
 
   <div id="toastContainer" class="toast-stack"></div>
-  <script src="/app.js?v=4.2"></script>
-  <script src="/tools.js?v=4.2"></script>
-  <script src="/extraToolsClient.js?v=4.2"></script>
+  <!-- Inti (shell + 5 tool inti) dimuat awal; extraToolsClient.js (15 tool berat, 97 KB)
+       di-load lazy oleh app.js saat tool pertama dari grup itu dibuka. -->
+  <script src="/app.js?v=4.3" defer></script>
+  <script src="/tools.js?v=4.3" defer></script>
 </body>
 </html>

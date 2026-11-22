@@ -1,6 +1,10 @@
 const express = require('express');
+const fs = require('fs');
 const path = require('path');
 const store = require('./src/store');
+const sentry = require('./src/sentry');
+const seo = require('./src/seo');
+const { getPoolHealth } = require('./src/poolHealth');
 const {
   parseWhatsAppPostLink,
   parseBulkLinks,
@@ -16,9 +20,13 @@ const toolsHub = require('./src/toolsHub');
 const extraTools = require('./src/extraTools');
 const { Readable } = require('stream');
 
+sentry.initSentry();
+
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = '0.0.0.0';
+const APP_VERSION = require('./package.json').version || '4.2.1';
+const STARTED_AT = Date.now();
 
 app.disable('x-powered-by');
 app.use(express.json({ limit: '4mb' }));
@@ -44,7 +52,10 @@ Object.entries(STATIC_ASSETS).forEach(([route, asset]) => {
 });
 
 app.use(
+  // index:false — jangan sajikan index.html dari static middleware agar
+  // fallback app.get('*') bisa meng-inject meta SEO per ?tool=<slug>
   express.static(path.join(__dirname, 'public'), {
+    index: false,
     setHeaders: (res, filePath) => {
       if (/\.(html|css|js)$/i.test(filePath)) {
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
@@ -53,12 +64,85 @@ app.use(
   })
 );
 
+// Pastikan data store (Redis/file) sudah dimuat sebelum menangani API.
+// Penting di serverless: cold start harus memuat dari Redis dulu.
+app.use('/api', async (req, res, next) => {
+  try {
+    await store.ensureLoaded();
+    next();
+  } catch (err) {
+    sentry.captureException(err, { url: req.originalUrl, method: req.method });
+    next();
+  }
+});
+
+// Health check — selalu JSON, dipakai uptime monitor & dashboard status
+app.get('/api/health', async (req, res) => {
+  const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+  const [dbPing, pool] = await Promise.all([
+    store.pingDb(),
+    getPoolHealth().catch(() => null)
+  ]);
+  // ok = aplikasi & DB responsif. Pool gateway eksternal bersifat informatif —
+  // bila semua gateway down, app tetap sehat (tool lain tetap jalan),
+  // dashboard /?tool=status yang menampilkan detail.
+  const ok = dbPing.ok;
+  res.status(ok ? 200 : 503).json({
+    ok,
+    timestamp: new Date().toISOString(),
+    uptimeSec: Math.round((Date.now() - STARTED_AT) / 1000),
+    version: APP_VERSION,
+    serverless: isServerless,
+    db: { ...store.getDbInfo(), ping: dbPing },
+    pool: pool
+      ? {
+          onlineCount: pool.onlineCount,
+          totalCount: pool.totalCount,
+          checkedAt: pool.checkedAt,
+          cached: pool.cached
+        }
+      : null,
+    sentry: sentry.isEnabled()
+  });
+});
+
+// Status pool gateway gratis (dashboard) — cache 30 detik di src/poolHealth.js
+app.get('/api/health/pool', async (req, res) => {
+  try {
+    const force = req.query.refresh === '1';
+    const pool = await getPoolHealth({ force });
+    res.json({ ok: true, ...pool });
+  } catch (err) {
+    sentry.captureException(err, { url: req.originalUrl, method: req.method });
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Beacon error dari frontend (tanpa SDK Sentry di browser).
+// Frontend POST { message, stack, url } — disimpan sebagai log + Sentry.
+app.post('/api/client-error', (req, res) => {
+  try {
+    const { message = '', stack = '', url = '' } = req.body || {};
+    const msg = String(message).slice(0, 500);
+    if (msg) {
+      runner.log('error', `Client error: ${msg}`, null, { url: String(url).slice(0, 300) });
+      const err = new Error(msg);
+      if (stack) err.stack = String(stack).slice(0, 2000);
+      sentry.captureException(err, { url: String(url).slice(0, 300), method: 'CLIENT' });
+    }
+  } catch {
+    // Abaikan — beacon tidak boleh gagalkan request
+  }
+  res.json({ ok: true });
+});
+
 // Bootstrap state
 app.get('/api/state', (req, res) => {
   const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
   res.json({
     ok: true,
     serverless: isServerless,
+    version: APP_VERSION,
     activeProviderId: store.data.activeProviderId,
     sandboxBalance: store.data.sandboxBalance,
     providers: store.getProviders(),
@@ -131,10 +215,11 @@ app.post('/api/parse-link', async (req, res) => {
 });
 
 // Simpan atau tambah Provider API
-app.post('/api/providers', (req, res) => {
+app.post('/api/providers', async (req, res) => {
   try {
     const saved = store.upsertProvider(req.body || {});
     runner.log('info', `Konfigurasi provider "${saved.name}" berhasil disimpan.`);
+    await store.flush();
     res.json({ ok: true, provider: saved, activeProviderId: store.data.activeProviderId });
   } catch (err) {
     res.status(400).json({ ok: false, error: err.message });
@@ -142,10 +227,11 @@ app.post('/api/providers', (req, res) => {
 });
 
 // Aktifkan Provider
-app.post('/api/providers/:id/activate', (req, res) => {
+app.post('/api/providers/:id/activate', async (req, res) => {
   try {
     const prov = store.setActiveProvider(req.params.id);
     runner.log('info', `Provider aktif diubah ke "${prov.name}".`);
+    await store.flush();
     res.json({ ok: true, activeProviderId: prov.id, provider: prov });
   } catch (err) {
     res.status(404).json({ ok: false, error: err.message });
@@ -153,9 +239,10 @@ app.post('/api/providers/:id/activate', (req, res) => {
 });
 
 // Hapus Provider Kustom
-app.delete('/api/providers/:id', (req, res) => {
+app.delete('/api/providers/:id', async (req, res) => {
   try {
     store.deleteProvider(req.params.id);
+    await store.flush();
     res.json({
       ok: true,
       providers: store.getProviders(),
@@ -208,7 +295,7 @@ app.post('/api/providers/:id/sync-services', async (req, res) => {
 });
 
 // Top-up / Reset Saldo Sandbox
-app.post('/api/sandbox/topup', (req, res) => {
+app.post('/api/sandbox/topup', async (req, res) => {
   const amount = Number(req.body?.amount) || 250000;
   store.data.sandboxBalance = amount;
   const sbx = store.getProvider('prov_sandbox');
@@ -221,6 +308,7 @@ app.post('/api/sandbox/topup', (req, res) => {
   }
   store.save();
   runner.log('info', `Saldo Mode Simulasi diatur ulang menjadi Rp ${amount.toLocaleString('id-ID')}.`);
+  await store.flush();
   res.json({ ok: true, sandboxBalance: amount, provider: sbx });
 });
 
@@ -321,6 +409,7 @@ app.post('/api/campaigns', async (req, res) => {
       store.save();
     }
 
+    await store.flush();
     res.json({
       ok: true,
       campaign,
@@ -353,16 +442,18 @@ app.post('/api/campaigns/:id/refresh-status', async (req, res) => {
 });
 
 // Bersihkan Riwayat Kampanye yang Sudah Selesai
-app.delete('/api/campaigns', (req, res) => {
+app.delete('/api/campaigns', async (req, res) => {
   store.data.campaigns = store.data.campaigns.filter((c) => c.status === 'running');
   store.save();
+  await store.flush();
   res.json({ ok: true, campaigns: store.data.campaigns });
 });
 
 // Bersihkan Log
-app.delete('/api/logs', (req, res) => {
+app.delete('/api/logs', async (req, res) => {
   store.data.logs = [];
   store.save();
+  await store.flush();
   res.json({ ok: true });
 });
 
@@ -695,6 +786,7 @@ app.all('/api/*', (req, res) => {
 
 // Global error handler agar kegagalan body-parser / runtime pada /api/* tetap berformat JSON
 app.use((err, req, res, next) => {
+  sentry.captureException(err, { url: req.originalUrl, method: req.method, status: err.status });
   if (req.path && req.path.startsWith('/api')) {
     const isTooLarge =
       err.type === 'entity.too.large' || err.status === 413 || /too large/i.test(err.message || '');
@@ -709,9 +801,55 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-// Fallback SPA ke index.html (hanya non-API)
+// =========================================================================
+// SEO: sitemap, robots, dan injeksi meta per tool (?tool=<slug>)
+// =========================================================================
+function getBaseUrl(req) {
+  if (process.env.APP_URL) return String(process.env.APP_URL).replace(/\/+$/, '');
+  const proto = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+  const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
+  return `${proto}://${host}`;
+}
+
+app.get('/sitemap.xml', (req, res) => {
+  res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.send(seo.buildSitemap(getBaseUrl(req)));
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.send(seo.buildRobots(getBaseUrl(req)));
+});
+
+// Cache HTML shell + hasil injeksi per slug (index.html jarang berubah)
+let _indexHtmlCache = null;
+const _seoHtmlCache = new Map();
+function readIndexHtml() {
+  if (_indexHtmlCache) return _indexHtmlCache;
+  _indexHtmlCache = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
+  return _indexHtmlCache;
+}
+
+// Fallback SPA ke index.html (hanya non-API) + injeksi SEO per tool
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  try {
+    const slug = seo.resolveSlug(req.query.tool);
+    const base = getBaseUrl(req);
+    const canonical = slug ? `${base}/?tool=${encodeURIComponent(slug)}` : `${base}/`;
+    const cacheKey = slug || '__home__';
+    if (!_seoHtmlCache.has(cacheKey)) {
+      const data = seo.getToolSeo(slug) || seo.getDefaultSeo();
+      _seoHtmlCache.set(cacheKey, seo.injectSeo(readIndexHtml(), data, canonical));
+    }
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.send(_seoHtmlCache.get(cacheKey));
+  } catch (err) {
+    sentry.captureException(err, { url: req.originalUrl, method: req.method });
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
 });
 
 if (require.main === module) {

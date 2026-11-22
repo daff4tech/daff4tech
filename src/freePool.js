@@ -582,17 +582,20 @@ async function sendFreePoolReaction({
  * Cek kesehatan server API gratis tanpa memotong kuota reaction
  */
 async function checkFreeGatewaysHealth() {
-  const probe = async (fn) => {
+  // probe selalu menyertakan id & name meski fetch gagal,
+  // agar dashboard status tetap bisa menampilkan nama gateway.
+  const probe = async (id, name, fn) => {
     try {
-      return await fn();
+      const result = await fn();
+      return { id, name, ...result };
     } catch (e) {
-      return { online: false, note: `Tidak merespons: ${e.message}` };
+      return { id, name, online: false, note: `Tidak merespons: ${e.message}` };
     }
   };
 
   const checks = await Promise.all([
     // 1. ReactionWA VIP pool — endpoint status ringan (tanpa memotong kuota)
-    probe(async () => {
+    probe('berry_vip', 'ReactionWA VIP Pool', async () => {
       const r = await fetchTimed(
         'https://api.reactionwa.online/api/v2/status',
         { headers: { 'User-Agent': CHROME_UA, Accept: 'application/json' } },
@@ -610,7 +613,7 @@ async function checkFreeGatewaysHealth() {
       };
     }),
     // 2. NexaDev relay
-    probe(async () => {
+    probe('nexadev_vip', 'NexaDev VIP Relay', async () => {
       const r = await fetchTimed(
         'https://nathan-react-wa.vercel.app/',
         { headers: { 'User-Agent': CHROME_UA } },
@@ -625,7 +628,7 @@ async function checkFreeGatewaysHealth() {
       };
     }),
     // 3. Leovan multi-pool (punya limit harian 5 request)
-    probe(async () => {
+    probe('leovan', 'Leovan Multi-Pool', async () => {
       const r = await fetchTimed(
         'https://www.leovan.my.id/',
         { headers: { 'User-Agent': CHROME_UA } },
@@ -644,7 +647,7 @@ async function checkFreeGatewaysHealth() {
       };
     }),
     // 4. XIYU cloud
-    probe(async () => {
+    probe('xiyu_cloud', 'XIYU Cloud RCH v2', async () => {
       const r = await fetchTimed(
         'https://api-cloud.my.id/tools/rchv2',
         { headers: { 'User-Agent': 'XIYU-REACH-CHANNEL-WA/1.0' } },

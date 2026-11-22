@@ -58,3 +58,29 @@ npm install
 npm start
 ```
 Aplikasi berjalan di `http://0.0.0.0:3000` dan siap di-deploy ke **Vercel**, **Render**, **Railway**, atau **Docker**.
+
+---
+
+## ⚙️ Konfigurasi Lingkungan (opsional — app jalan normal tanpa ini)
+
+Salin `.env.example` menjadi `.env` (lokal) atau isi di dashboard Vercel/Render.
+
+| Variabel | Fungsi |
+| --- | --- |
+| `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` | Persistensi eksternal (Upstash Redis REST). Tanpa ini data disimpan ke file (`data/db.json`, ephemeral di Vercel). |
+| `REDIS_KEY` | Kunci Redis (default `d4tech:db:v1`). |
+| `SENTRY_DSN` | Error monitoring backend (+ beacon `/api/client-error` dari frontend). Tanpa DSN: no-op. |
+| `SENTRY_ENVIRONMENT` / `SENTRY_TRACES_SAMPLE_RATE` | Environment Sentry & sample rate tracing (default `0`). |
+| `APP_URL` | URL publik (canonical + `sitemap.xml`). Default: deteksi dari host request. |
+| `POOL_HEALTH_TTL_MS` | TTL cache dashboard status pool (default 30000). |
+
+### Endpoint operasional baru
+- `GET /api/health` — JSON liveness/readiness: uptime, versi, status DB (redis/file + latency), ringkasan pool gateway, status Sentry. `200` bila aplikasi+DB sehat, `503` bila tidak.
+- `GET /api/health/pool[?refresh=1]` — detail 4 gateway pool gratis (cache 30 dtk, single-flight). Dipakai halaman **Status Server** (`/?tool=status`).
+- `POST /api/client-error` — beacon error frontend → Sentry/log server.
+- `GET /sitemap.xml` & `GET /robots.txt` — SEO; `<title>`/meta/JSON-LD di-inject server per `?tool=<slug>`.
+
+### Perubahan arsitektur v4.3
+- **Persistensi Redis (opsional)**: `src/store.js` kini in-memory + write-through async ke Redis/file; `store.ensureLoaded()` di-await middleware `/api/*` (aman untuk cold start serverless). Mutasi route menunggu `store.flush()` sebelum merespons.
+- **Lazy-load per tool**: bundle `extraToolsClient.js` (~97 KB, 15 tool) hanya diunduh saat tool terkait dibuka; shell inti (`app.js` + `tools.js` dengan `defer`) muat lebih dulu.
+- **SEO per tool**: 21 slug + alias; SPA fallback menyuntik `<title>`, description/OG/Twitter meta, canonical, dan JSON-LD `WebApplication`.

@@ -20,6 +20,38 @@
     previewChannelName: ''
   };
 
+  // Kirim error frontend ke server (di-forward ke Sentry bila SENTRY_DSN diisi).
+  // Dibatasi 3 kirim per sesi agar tidak membanjiri jaringan.
+  let clientErrorCount = 0;
+  function reportClientError(message, stack) {
+    if (clientErrorCount >= 3) return;
+    clientErrorCount += 1;
+    try {
+      fetch('/api/client-error', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
+        body: JSON.stringify({
+          message: String(message || 'Unknown error').slice(0, 500),
+          stack: String(stack || '').slice(0, 2000),
+          url: window.location.href
+        })
+      }).catch(() => {});
+    } catch {
+      // Abaikan
+    }
+  }
+  window.addEventListener('error', (event) => {
+    reportClientError(event.message, event.error && event.error.stack);
+  });
+  window.addEventListener('unhandledrejection', (event) => {
+    const reason = event.reason;
+    reportClientError(
+      (reason && reason.message) || String(reason || 'Unhandled promise rejection'),
+      reason && reason.stack
+    );
+  });
+
   function esc(str) {
     return String(str ?? '')
       .replace(/&/g, '&amp;')
@@ -71,6 +103,155 @@
       throw new Error(data.error || `Gagal (${res.status})`);
     }
     return data;
+  }
+
+  // =========================================================================
+  // LAZY-LOAD BUNDLE TOOL EKSTRA (extraToolsClient.js ~97 KB, 15 tool)
+  // Bundle hanya diunduh saat user membuka tool yang membutuhkannya —
+  // pertama kali via ?tool=... saat load, atau saat klik kartu/menu.
+  // =========================================================================
+  const EXTRA_TOOL_SLUGS = new Set([
+    'roaster', 'remini', 'aiimage', 'audiostudio', 'tts', 'receipt', 'osint',
+    'pixelvault', 'cyberutil', 'emojimix', 'shazam', 'ytsummary', 'compressor',
+    'imgtopdf', 'mlbbwr'
+  ]);
+
+  // Judul tab per tool (server juga meng-inject <title> per ?tool=<slug>)
+  const TOOL_SEO_TITLES = {
+    home: 'D4Tech Hub — Direktori 21 Perangkat Kreator, AI & Siber',
+    send: 'Reaction Saluran WhatsApp — D4Tech Hub',
+    ytmp3: 'YouTube ke MP3 Multi-Kualitas — D4Tech Hub',
+    downloader: 'Downloader Tanpa Watermark — D4Tech Hub',
+    remini: 'Penjernih Foto HD Gratis — D4Tech Hub',
+    removebg: 'Hapus Background & Pasfoto — D4Tech Hub',
+    audiostudio: 'Studio Audio 8D & FX — D4Tech Hub',
+    emojimix: 'Emoji Kitchen & Brat — D4Tech Hub',
+    shazam: 'Pendeteksi Lagu FYP (Shazam) — D4Tech Hub',
+    ytsummary: 'Ringkas YouTube, Transkrip & 4K — D4Tech Hub',
+    compressor: 'Kompresor Foto KB — D4Tech Hub',
+    imgtopdf: 'Gabung Foto ke PDF — D4Tech Hub',
+    aiimage: 'AI Image Generator — D4Tech Hub',
+    roaster: 'AI Roaster & Skor Aura — D4Tech Hub',
+    stalker: 'Analitik TikTok & WA — D4Tech Hub',
+    generator: 'Stiker Komentar & Chat — D4Tech Hub',
+    receipt: 'Struk Kasir & Lirik — D4Tech Hub',
+    mlbbwr: 'Kalkulator WR MLBB — D4Tech Hub',
+    osint: 'Pencari Username OSINT — D4Tech Hub',
+    pixelvault: 'Pixel Vault Steganografi — D4Tech Hub',
+    cyberutil: 'Scanner Link & QR Logo — D4Tech Hub',
+    tts: 'Studio Narator Dracin & AI TTS — D4Tech Hub',
+    status: 'Status Server & Kesehatan Pool Gateway — D4Tech Hub'
+  };
+
+  let extraToolsPromise = null;
+  function ensureExtraToolsBundle() {
+    if (extraToolsPromise) return extraToolsPromise;
+    extraToolsPromise = new Promise((resolve, reject) => {
+      if (window.__d4techExtraToolsLoaded) return resolve();
+      const script = document.createElement('script');
+      script.src = '/extraToolsClient.js?v=4.3';
+      script.defer = true;
+      script.onload = () => {
+        window.__d4techExtraToolsLoaded = true;
+        resolve();
+      };
+      script.onerror = () => {
+        extraToolsPromise = null; // izinkan retry saat klik berikutnya
+        reject(new Error('Gagal memuat bundle tool ekstra'));
+      };
+      document.head.appendChild(script);
+    });
+    return extraToolsPromise.catch((err) => {
+      toast(err.message || 'Gagal memuat modul tool.', 'error');
+    });
+  }
+
+  // =========================================================================
+  // DASHBOARD STATUS SERVER (#11): health pool gateway gratis
+  // =========================================================================
+  let poolStatusTimer = null;
+
+  function poolStatusEsc(str) {
+    return esc(str);
+  }
+
+  function renderPoolStatusCards(data) {
+    const grid = document.getElementById('poolStatusGrid');
+    const summary = document.getElementById('poolStatusSummary');
+    if (!grid || !summary) return;
+
+    const gateways = Array.isArray(data.gateways) ? data.gateways : [];
+    const online = Number(data.onlineCount || 0);
+    const total = Number(data.totalCount || data.totalGateways || gateways.length || 0);
+    const checked = data.checkedAt ? new Date(data.checkedAt) : new Date();
+    const cacheLabel = data.cached ? ' (cache 30 dtk)' : '';
+
+    const summaryColor = online > 0 ? '#0f9d63' : '#d64545';
+    summary.innerHTML = `
+      <div style="font-size:1.05rem; font-weight:700; color:${summaryColor};">
+        ${online}/${total} gateway online
+      </div>
+      <div style="margin-top:0.35rem; font-size:0.85rem;">
+        ${poolStatusEsc(data.note || '')}
+      </div>
+      <div style="margin-top:0.35rem; font-size:0.75rem; color:var(--text-muted);">
+        Diperiksa: ${checked.toLocaleTimeString('id-ID')} • ${Number(data.latencyMs || 0)} ms${cacheLabel} • failover: ${poolStatusEsc(data.failover || 'combined_pool')}
+      </div>`;
+
+    if (!gateways.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--text-muted);">Tidak ada data gateway.</div>';
+      return;
+    }
+
+    grid.innerHTML = gateways
+      .map((gw) => {
+        const isOnline = gw.online === true;
+        const badge = isOnline ? 'ONLINE' : 'OFFLINE';
+        const badgeBg = isOnline ? 'rgba(15,157,99,0.12)' : 'rgba(214,69,69,0.12)';
+        const badgeColor = isOnline ? '#0f9d63' : '#d64545';
+        const dot = isOnline ? '🟢' : '🔴';
+        return `
+        <div class="card" style="padding:0.9rem; border:1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius:12px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:0.5rem;">
+            <strong style="font-size:0.92rem;">${dot} ${poolStatusEsc(gw.name || gw.id || 'Gateway')}</strong>
+            <span style="font-size:0.7rem; font-weight:700; letter-spacing:0.04em; padding:0.2rem 0.55rem; border-radius:999px; background:${badgeBg}; color:${badgeColor};">${badge}</span>
+          </div>
+          <div style="margin-top:0.45rem; font-size:0.8rem; color:var(--text-muted);">${poolStatusEsc(gw.note || '')}</div>
+        </div>`;
+      })
+      .join('');
+  }
+
+  async function renderPoolStatus(force = false) {
+    const summary = document.getElementById('poolStatusSummary');
+    const grid = document.getElementById('poolStatusGrid');
+    if (!summary || !grid) return;
+    const btn = document.getElementById('btnRefreshPoolStatus');
+    if (btn) btn.disabled = true;
+    summary.textContent = force ? 'Memeriksa ulang gateway...' : 'Memeriksa status gateway...';
+    try {
+      const data = await api(`/api/health/pool${force ? '?refresh=1' : ''}`);
+      renderPoolStatusCards(data);
+    } catch (err) {
+      summary.innerHTML = `<span style="color:#d64545;">Gagal memeriksa status pool: ${poolStatusEsc(err.message)}</span>`;
+      grid.innerHTML = '';
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  function startPoolStatusAutoRefresh() {
+    stopPoolStatusAutoRefresh();
+    poolStatusTimer = setInterval(() => {
+      if (state.view === 'status') renderPoolStatus(false);
+    }, 30000);
+  }
+
+  function stopPoolStatusAutoRefresh() {
+    if (poolStatusTimer) {
+      clearInterval(poolStatusTimer);
+      poolStatusTimer = null;
+    }
   }
 
   // =========================================================================
@@ -160,6 +341,26 @@
     }
 
     window.scrollTo({ top: 0, behavior: 'instant' });
+
+    // Update judul tab saat pindah tool (deep-link)
+    try {
+      document.title = TOOL_SEO_TITLES[resolved] || TOOL_SEO_TITLES.home;
+    } catch {
+      // Abaikan
+    }
+
+    // Muat bundle tool ekstra secara lazy bila tool yang dibuka membutuhkannya
+    if (EXTRA_TOOL_SLUGS.has(resolved)) {
+      ensureExtraToolsBundle();
+    }
+
+    // Dashboard status: render + auto-refresh 30 detik selama view aktif
+    if (resolved === 'status') {
+      renderPoolStatus(false);
+      startPoolStatusAutoRefresh();
+    } else {
+      stopPoolStatusAutoRefresh();
+    }
 
     if (resolved === 'history') renderCampaigns();
     if (resolved === 'settings') renderProviders();
@@ -963,6 +1164,11 @@
     document.getElementById('btnToggleAdvanced')?.addEventListener('click', () => {
       const box = document.getElementById('advancedOptionsBox');
       box?.classList.toggle('hidden');
+    });
+
+    // Tombol periksa ulang dashboard status gateway
+    document.getElementById('btnRefreshPoolStatus')?.addEventListener('click', () => {
+      renderPoolStatus(true);
     });
 
     document.getElementById('campaignProvider')?.addEventListener('change', updateProviderModeUI);

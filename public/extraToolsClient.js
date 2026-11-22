@@ -2526,7 +2526,10 @@
     calculateWr(false);
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  // Init langsung bila script di-load lazy SETELAH DOMContentLoaded
+  // (app.js memuat file ini on-demand saat tool pertama dibuka).
+  function bootExtraTools() {
+    if (window.__d4techExtraToolsLoaded) return; // jangan double-init
     initRoaster();
     initRemini();
     initAiImage();
@@ -2542,5 +2545,11 @@
     initCompressor();
     initImgToPdf();
     initMlbbWr();
-  });
+    window.__d4techExtraToolsLoaded = true;
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootExtraTools);
+  } else {
+    bootExtraTools();
+  }
 })();

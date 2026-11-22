@@ -9,6 +9,65 @@ const DATA_DIR = IS_SERVERLESS
   : path.join(__dirname, '..', 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 
+/**
+ * Persistensi eksternal (Upstash Redis REST) + fallback file.
+ *
+ * Kenapa: di Vercel serverless filesystem bersifat ephemeral — data/db.json
+ * hilang tiap cold start. Dengan Redis, providers/campaigns/logs persisten
+ * antar invokasi.
+ *
+ * Env (opsional — tanpa ini app otomatis pakai file seperti sebelumnya):
+ *   UPSTASH_REDIS_REST_URL    — contoh: https://xxx.upstash.io
+ *   UPSTASH_REDIS_REST_TOKEN  — token REST Upstash
+ *   REDIS_KEY                 — kunci Redis (default: d4tech:db:v1)
+ *
+ * Desain: data selalu ada di memori (this.data) sehingga API sinkron lama
+ * tetap jalan. save() menulis async (write-through) ke Redis + file cache.
+ * ensureLoaded() wajib di-await middleware sebelum menangani request API
+ * agar cold start memuat data terbaru dari Redis.
+ */
+
+const REDIS_KEY = process.env.REDIS_KEY || 'd4tech:db:v1';
+
+function getRedisConfig() {
+  const url = String(process.env.UPSTASH_REDIS_REST_URL || '').trim().replace(/\/+$/, '');
+  const token = String(process.env.UPSTASH_REDIS_REST_TOKEN || '').trim();
+  if (!url || !token) return null;
+  return { url, token };
+}
+
+async function redisCommand(command) {
+  const cfg = getRedisConfig();
+  if (!cfg) return null;
+  const res = await fetch(cfg.url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${cfg.token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(command)
+  });
+  if (!res.ok) {
+    throw new Error(`Redis HTTP ${res.status}`);
+  }
+  const json = await res.json();
+  if (json && json.error) throw new Error(json.error);
+  return json ? json.result : null;
+}
+
+async function redisGet() {
+  return redisCommand(['GET', REDIS_KEY]);
+}
+
+async function redisSet(value) {
+  return redisCommand(['SET', REDIS_KEY, value]);
+}
+
+async function redisPing() {
+  await redisCommand(['PING']);
+  return true;
+}
+
 const FREE_POOL_PROVIDER = {
   id: 'prov_free_pool',
   name: '⚡ API Gratis Publik (Multi-Server Otomatis)',
@@ -179,46 +238,189 @@ function createDefaultDb() {
   };
 }
 
+function ensureFreePool(parsed) {
+  if (!parsed || !Array.isArray(parsed.providers)) return parsed;
+  const hasFreePool = parsed.providers.some((p) => p.id === 'prov_free_pool');
+  if (!hasFreePool) {
+    parsed.providers.unshift({ ...FREE_POOL_PROVIDER });
+    parsed.activeProviderId = 'prov_free_pool';
+  }
+  return parsed;
+}
+
 class Store {
   constructor() {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    this.redisConfigured = Boolean(getRedisConfig());
+    this.dbType = this.redisConfigured ? 'redis' : 'file';
+    this.dbOk = false;
+    this.lastError = null;
+    // Data awal langsung tersedia (sinkron) agar require() lama tidak pecah.
+    // ensureLoaded() akan menggantinya dengan data Redis/file saat siap.
+    this.data = createDefaultDb();
+    try {
+      if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+      }
+    } catch {
+      // Abaikan — direktori mungkin read-only di serverless; Redis tetap jalan.
     }
-    this.data = this._load();
+    this._saveQueue = Promise.resolve();
+    this._loadPromise = this._loadAsync();
   }
 
-  _load() {
+  async ensureLoaded() {
+    try {
+      await this._loadPromise;
+    } catch {
+      // _loadAsync tidak pernah reject; ini pengaman saja.
+    }
+    return this.data;
+  }
+
+  getDbInfo() {
+    return {
+      type: this.dbType,
+      ok: this.dbOk,
+      key: this.redisConfigured ? REDIS_KEY : null,
+      file: DB_FILE,
+      serverless: IS_SERVERLESS,
+      lastError: this.lastError
+    };
+  }
+
+  async pingDb() {
+    const started = Date.now();
+    try {
+      if (this.redisConfigured) {
+        await redisPing();
+      } else {
+        // File: pastikan bisa ditulis (cek direktori ada + file bisa dibaca/ditulis)
+        try {
+          if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+        } catch {
+          // Abaikan
+        }
+      }
+      this.dbOk = true;
+      this.lastError = null;
+      return { ok: true, latencyMs: Date.now() - started };
+    } catch (err) {
+      this.dbOk = false;
+      this.lastError = err.message;
+      return { ok: false, latencyMs: Date.now() - started, error: err.message };
+    }
+  }
+
+  _loadFile() {
     try {
       if (fs.existsSync(DB_FILE)) {
         const raw = fs.readFileSync(DB_FILE, 'utf8');
         const parsed = JSON.parse(raw);
         if (parsed && Array.isArray(parsed.providers)) {
-          // Pastikan prov_free_pool selalu tersedia bila upgrade dari versi sebelumnya
-          const hasFreePool = parsed.providers.some((p) => p.id === 'prov_free_pool');
-          if (!hasFreePool) {
-            parsed.providers.unshift({ ...FREE_POOL_PROVIDER });
-            parsed.activeProviderId = 'prov_free_pool';
-            this._write(parsed);
-          }
-          return parsed;
+          return ensureFreePool(parsed);
         }
       }
     } catch (err) {
-      console.error('Gagal membaca db.json, membuat baru:', err.message);
+      console.error('Gagal membaca db.json:', err.message);
     }
-    const fresh = createDefaultDb();
-    this._write(fresh);
-    return fresh;
+    return null;
   }
 
-  _write(dataObj = this.data) {
-    const tmp = `${DB_FILE}.tmp`;
-    fs.writeFileSync(tmp, JSON.stringify(dataObj, null, 2), 'utf8');
-    fs.renameSync(tmp, DB_FILE);
+  _writeFile(dataObj = this.data) {
+    try {
+      const tmp = `${DB_FILE}.tmp`;
+      fs.writeFileSync(tmp, JSON.stringify(dataObj, null, 2), 'utf8');
+      fs.renameSync(tmp, DB_FILE);
+    } catch (err) {
+      // Di serverless /tmp biasanya bisa ditulis; bila gagal, jangan crash.
+      console.warn('[store] tulis file cache gagal (non-fatal):', err.message);
+    }
   }
 
+  async _loadAsync() {
+    // 1) Coba Redis bila dikonfigurasi
+    if (this.redisConfigured) {
+      try {
+        const raw = await redisGet();
+        if (raw) {
+          const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+          if (parsed && Array.isArray(parsed.providers)) {
+            this.data = ensureFreePool(parsed);
+            this.dbOk = true;
+            this.lastError = null;
+            // Sinkronkan cache file lokal (best-effort)
+            this._writeFile(this.data);
+            return this.data;
+          }
+        }
+        // Redis kosong → seed dari file lokal bila ada, lalu tulis ke Redis
+        const fromFile = this._loadFile();
+        this.data = fromFile || createDefaultDb();
+        this.dbOk = true;
+        this.lastError = null;
+        await redisSet(JSON.stringify(this.data));
+        this._writeFile(this.data);
+        return this.data;
+      } catch (err) {
+        console.warn('[store] Redis tidak terjangkau, fallback ke file:', err.message);
+        this.lastError = err.message;
+        // Lanjut ke fallback file di bawah
+      }
+    }
+
+    // 2) Fallback file (perilaku lama)
+    const fromFile = this._loadFile();
+    if (fromFile) {
+      this.data = fromFile;
+      this.dbOk = true;
+      this.lastError = null;
+      return this.data;
+    }
+    this.data = createDefaultDb();
+    this.dbOk = true;
+    this.lastError = null;
+    this._writeFile(this.data);
+    return this.data;
+  }
+
+  /** Tunggu seluruh save() yang mengantre selesai (dipakai route mutasi sebelum res.json). */
+  flush() {
+    return this._saveQueue;
+  }
+
+  /**
+   * Simpan data (async, tidak melempar agar pemanggil sinkron lama aman).
+   * Ditulis berurutan via _saveQueue agar tidak ada race condition.
+   * Untuk jalur kritis, server.js bisa `await store.save()`.
+   */
   save() {
-    this._write(this.data);
+    const snapshot = JSON.stringify(this.data);
+    this._saveQueue = this._saveQueue
+      .then(async () => {
+        // Selalu tulis cache file (lokal dev + fallback)
+        this._writeFile(this.data);
+        if (this.redisConfigured) {
+          try {
+            await redisSet(snapshot);
+            this.dbOk = true;
+            this.lastError = null;
+          } catch (err) {
+            this.dbOk = false;
+            this.lastError = err.message;
+            console.warn('[store] tulis Redis gagal (non-fatal):', err.message);
+            try {
+              const sentry = require('./sentry');
+              sentry.captureException(err, { url: 'store.save/redis' });
+            } catch {
+              // Abaikan
+            }
+          }
+        }
+      })
+      .catch(() => {
+        // Jangan biarkan rantai queue mati
+      });
+    return this._saveQueue;
   }
 
   generateId(prefix = 'id') {

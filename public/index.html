@@ -1,0 +1,2018 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#101828" />
+  <title>D4Tech Hub — Direktori 21 Perangkat Kreator, AI &amp; Siber</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icon-192.png" />
+  <link rel="icon" type="image/png" href="/favicon.png?v=4.1" />
+  <link rel="stylesheet" href="/styles.css?v=4.1" />
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- TOP NAVBAR -->
+    <header class="navbar">
+      <div class="navbar-inner">
+        <a href="#" class="brand" id="brandHomeLink">
+          <img src="/logo-d4tech.png" alt="D4Tech Hub" class="brand-logo-img" />
+          <div class="brand-copy">
+            <span class="brand-name">D4Tech Hub</span>
+            <span class="brand-version">v4.1</span>
+            <span class="brand-sub">Direktori Perangkat Kreator, AI &amp; Siber</span>
+          </div>
+        </a>
+
+        <div class="nav-right">
+          <button type="button" class="nav-cmd-btn" id="btnQuickSearchNav" title="Cari perangkat (Ctrl+K)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </svg>
+            <span class="nav-cmd-label">Cari tool...</span>
+            <kbd class="nav-cmd-kbd">Ctrl K</kbd>
+          </button>
+
+          <button type="button" class="nav-home-btn active" id="btnNavHome" title="Kembali ke Direktori Beranda">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5z"></path>
+            </svg>
+            <span>Direktori</span>
+          </button>
+
+          <button type="button" class="btn-pwa-install" id="btnInstallPwa" title="Pasang D4Tech Hub ke perangkat">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3v12"></path>
+              <path d="m7 10 5 5 5-5"></path>
+              <path d="M5 21h14"></path>
+            </svg>
+            <span>Install App</span>
+          </button>
+
+          <button type="button" class="tiktok-nav-btn" id="btnOpenTikTokModal" title="TikTok resmi @df4tch_">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+            </svg>
+            <span>@df4tch_</span>
+          </button>
+
+          <button type="button" class="icon-btn" id="themeToggleBtn" title="Ganti tema terang / gelap" aria-label="Ganti Tema">
+            <span id="themeIcon" style="display:inline-flex;"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- APP SHELL (Direktori Penuh di Beranda, 2-Kolom Sidebar di dalam Tool) -->
+    <div class="app-shell" id="appShell">
+      <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+      <!-- SIDEBAR NAVIGASI TERKELOMPOK -->
+      <aside id="workspaceSidebar" class="workspace-sidebar hidden" aria-label="Navigasi Perangkat">
+        <div class="sidebar-mobile-head">
+          <span>Daftar Perangkat (21)</span>
+          <button type="button" class="icon-btn" id="btnCloseMobileSidebar" aria-label="Tutup Menu">&times;</button>
+        </div>
+
+        <div class="sidebar-search-wrap">
+          <input type="text" id="sidebarFilterInput" class="sidebar-search-input" placeholder="Filter daftar tool..." />
+        </div>
+
+        <div id="quickSwitcherBar">
+          <div class="sidebar-group">
+            <div class="sidebar-group-label">Sosmed &amp; Musik</div>
+            <div class="sidebar-nav-list">
+              <button type="button" class="quick-tool-pill" data-tool-target="send">Reaction Saluran WA</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="ytmp3">YouTube ke MP3</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="downloader">Downloader Tanpa WM</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="shazam">Pendeteksi Lagu FYP</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="stalker">Analitik TikTok &amp; WA</button>
+            </div>
+          </div>
+
+          <div class="sidebar-group">
+            <div class="sidebar-group-label">AI &amp; Citra HD</div>
+            <div class="sidebar-nav-list">
+              <button type="button" class="quick-tool-pill" data-tool-target="remini">Penjernih Foto HD</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="removebg">Hapus Background &amp; Pasfoto</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="aiimage">AI Image Generator</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="ytsummary">Ringkas YouTube &amp; 4K</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="roaster">AI Roaster &amp; Skor Aura</button>
+            </div>
+          </div>
+
+          <div class="sidebar-group">
+            <div class="sidebar-group-label">Audio &amp; Kreator</div>
+            <div class="sidebar-nav-list">
+              <button type="button" class="quick-tool-pill" data-tool-target="tts">Narator Dracin &amp; TTS</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="audiostudio">Studio Audio 8D &amp; FX</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="emojimix">Emoji Kitchen &amp; Brat</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="generator">Stiker Komentar &amp; Chat</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="receipt">Struk Kasir &amp; Lirik</button>
+            </div>
+          </div>
+
+          <div class="sidebar-group">
+            <div class="sidebar-group-label">Dokumen, Siber &amp; Gim</div>
+            <div class="sidebar-nav-list">
+              <button type="button" class="quick-tool-pill" data-tool-target="compressor">Kompresor Foto KB</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="imgtopdf">Gabung Foto ke PDF</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="mlbbwr">Kalkulator WR MLBB</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="osint">Pencari Username OSINT</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="pixelvault">Pixel Vault Steganografi</button>
+              <button type="button" class="quick-tool-pill" data-tool-target="cyberutil">Scanner Link &amp; QR Logo</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- KOLOM UTAMA -->
+      <div class="workspace-main-col">
+        <!-- BAR KONTEKS TOOL AKTIF -->
+        <div id="workspaceTopbar" class="workspace-topbar hidden">
+          <div class="workspace-breadcrumb">
+            <button type="button" class="btn-back-home" id="btnBackHome">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m15 18-6-6 6-6"></path>
+              </svg>
+              <span>Direktori</span>
+            </button>
+            <span class="crumb-sep">/</span>
+            <span class="crumb-current" id="activeToolBreadcrumb">Perangkat</span>
+          </div>
+
+          <div class="workspace-topbar-actions">
+            <button type="button" class="btn-mobile-tools" id="btnOpenMobileSidebar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+              <span>Semua Tool</span>
+            </button>
+            <button type="button" class="btn-share-tool" id="btnShareCurrentTool" title="Salin tautan langsung ke perangkat ini">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+              <span>Salin Tautan</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- KONTEN UTAMA -->
+        <main class="container is-home" id="mainContainer">
+
+          <!-- =================================================================
+               HALAMAN UTAMA / DIREKTORI 21 PERANGKAT
+               ================================================================= -->
+          <section class="view active" id="view-home">
+            <div class="home-shell">
+              <div class="directory-header">
+                <div>
+                  <div class="directory-kicker">D4TECH WORKSPACE &bull; TANPA REGISTRASI</div>
+                  <h1 class="landing-title">Perangkat kerja digital untuk kreator, pengolahan AI, dan utilitas dokumen.</h1>
+                  <p class="landing-sub">
+                    Pilih salah satu dari 21 modul di bawah untuk langsung bekerja — mulai dari ekstraksi audio 320 kbps, narator cerita otomatis, penjernih foto multi-GPU, hingga konversi dokumen PDF lokal di peramban.
+                  </p>
+                </div>
+
+                <div class="directory-controls">
+                  <div class="hero-search-wrap">
+                    <span class="hero-search-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                      </svg>
+                    </span>
+                    <input
+                      type="text"
+                      id="homeSearchInput"
+                      class="hero-search-input"
+                      placeholder="Cari berdasarkan fungsi... (MP3, Dracin, Pasfoto, PDF, Shazam)"
+                    />
+                    <span class="search-kbd">Ctrl K</span>
+                  </div>
+                  <div class="directory-meta-row">
+                    <span id="directoryResultCount">Menampilkan 21 perangkat aktif</span>
+                    <span>Sematkan favorit untuk akses cepat</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB KATEGORI -->
+              <div class="cat-filter-bar" id="homeCategoryBar" role="tablist">
+                <button type="button" class="cat-pill active" data-cat="all">Semua (21)</button>
+                <button type="button" class="cat-pill" data-cat="fav">Disematkan</button>
+                <button type="button" class="cat-pill" data-cat="sosmed">Sosmed &amp; Musik</button>
+                <button type="button" class="cat-pill" data-cat="ai">AI &amp; Citra HD</button>
+                <button type="button" class="cat-pill" data-cat="kreator">Audio &amp; Konten</button>
+                <button type="button" class="cat-pill" data-cat="siber">Dokumen, Siber &amp; Gim</button>
+              </div>
+
+              <!-- DIREKTORI 21 PERANGKAT -->
+              <div class="bento-grid" id="homeBentoGrid">
+                <!-- 1 -->
+                <button type="button" class="bento-card" data-open-tool="send" data-tool-cat="sosmed" data-tool-keywords="wa whatsapp reaction saluran channel emoji booster">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                      </span>
+                      <span class="bento-tag tag-hot">Multi-Gateway</span>
+                    </div>
+                    <div class="bento-title">Reaction Saluran WhatsApp</div>
+                    <div class="bento-desc">Kirim kombinasi multi-emoji ke tautan postingan Saluran WhatsApp secara otomatis melalui jaringan pool publik.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 2 -->
+                <button type="button" class="bento-card" data-open-tool="ytmp3" data-tool-cat="sosmed" data-tool-keywords="youtube mp3 musik lagu bitrate 320kbps 128kbps download audio">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                      </span>
+                      <span class="bento-tag tag-hot">64–320 kbps</span>
+                    </div>
+                    <div class="bento-title">YouTube ke MP3 Multi-Kualitas</div>
+                    <div class="bento-desc">Ekstrak audio dari tautan YouTube atau pencarian judul lagu dengan pilihan bitrate hingga 320 kbps Hi-Fi.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 3 -->
+                <button type="button" class="bento-card" data-open-tool="tts" data-tool-cat="kreator" data-tool-keywords="tts dracin alur cerita drama china bgm gemini voice over narator suara tiktok bahasa indonesia mp3">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                      </span>
+                      <span class="bento-tag tag-hot">Dracin + BGM</span>
+                    </div>
+                    <div class="bento-title">Studio Narator Dracin &amp; AI TTS</div>
+                    <div class="bento-desc">Sintesis suara narator alur cerita film lengkap dengan musik latar dramatis, suara natural Gemini, dan 7 bahasa.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 4 -->
+                <button type="button" class="bento-card" data-open-tool="downloader" data-tool-cat="sosmed" data-tool-keywords="tiktok downloader video tanpa watermark slide foto ig reels mp4">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                      </span>
+                      <span class="bento-tag">Tanpa WM</span>
+                    </div>
+                    <div class="bento-title">Downloader TikTok &amp; Sosmed HD</div>
+                    <div class="bento-desc">Unduh video TikTok resolusi asli tanpa tanda air, koleksi slide foto, trek MP3, serta Reels sosial media.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 5 -->
+                <button type="button" class="bento-card" data-open-tool="remini" data-tool-cat="ai" data-tool-keywords="remini jernihkan foto hd blur burik upscale tajam">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                      </span>
+                      <span class="bento-tag tag-ai">Cloud GPU</span>
+                    </div>
+                    <div class="bento-title">Penjernih Foto HD (Remini)</div>
+                    <div class="bento-desc">Restorasi detail wajah dan ketajaman foto beresolusi rendah dilengkapi penggeser perbandingan langsung.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 6 -->
+                <button type="button" class="bento-card" data-open-tool="removebg" data-tool-cat="ai" data-tool-keywords="hapus background foto ai pasfoto merah biru transparan png">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
+                      </span>
+                      <span class="bento-tag tag-ai">Cutout + Pasfoto</span>
+                    </div>
+                    <div class="bento-title">Hapus Background &amp; Pasfoto</div>
+                    <div class="bento-desc">Pisahkan objek utama dari latar belakang secara presisi lalu terapkan latar transparan, merah, atau biru pasfoto.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 7 -->
+                <button type="button" class="bento-card" data-open-tool="audiostudio" data-tool-cat="kreator" data-tool-keywords="8d audio slowed reverb nightcore bass booster jedag jedug lagu">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg>
+                      </span>
+                      <span class="bento-tag">WebAudio DSP</span>
+                    </div>
+                    <div class="bento-title">Studio Audio 8D, Slowed &amp; Reverb</div>
+                    <div class="bento-desc">Olahan efek spasial 8D, Slowed + Reverb, Nightcore, dan penguat sub-bass langsung di peramban dengan ekspor WAV.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 8 -->
+                <button type="button" class="bento-card" data-open-tool="emojimix" data-tool-cat="kreator" data-tool-keywords="emoji mix kitchen gabung stiker wa brat meme teks viral">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                      </span>
+                      <span class="bento-tag tag-hot">PNG Sticker</span>
+                    </div>
+                    <div class="bento-title">Emoji Mix Kitchen &amp; Brat Maker</div>
+                    <div class="bento-desc">Padukan dua emoji menjadi stiker PNG transparan dari katalog Google Emoji Kitchen atau buat sampul teks Brat.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 9 -->
+                <button type="button" class="bento-card" data-open-tool="shazam" data-tool-cat="sosmed" data-tool-keywords="shazam cari judul lagu musik fyp tiktok audio recognizer whatsmusic">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v2"/><path d="M12 19v2"/></svg>
+                      </span>
+                      <span class="bento-tag tag-ai">Audio Fingerprint</span>
+                    </div>
+                    <div class="bento-title">Pendeteksi Judul Lagu FYP</div>
+                    <div class="bento-desc">Identifikasi judul lagu, artis, dan album asli dari potongan video pendek MP4 maupun rekaman audio.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 10 -->
+                <button type="button" class="bento-card" data-open-tool="ytsummary" data-tool-cat="ai" data-tool-keywords="youtube summarize rangkuman ai transkrip subtitle thumbnail 4k hd">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polygon points="10 9 15 12 10 15 10 9"/></svg>
+                      </span>
+                      <span class="bento-tag tag-ai">AI + 4K</span>
+                    </div>
+                    <div class="bento-title">Ringkas YouTube &amp; Thumbnail 4K</div>
+                    <div class="bento-desc">Rangkum poin utama video YouTube ke Bahasa Indonesia, ekstrak teks transkrip penuh, dan unduh sampul MaxRes.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 11 -->
+                <button type="button" class="bento-card" data-open-tool="compressor" data-tool-cat="siber" data-tool-keywords="kompres foto ukuran kb mb 100kb 200kb webp png jpg konverter">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                      </span>
+                      <span class="bento-tag">100% Lokal</span>
+                    </div>
+                    <div class="bento-title">Kompresor Foto Target KB &amp; Format</div>
+                    <div class="bento-desc">Perkecil ukuran berkas foto tepat di bawah batas syarat unggah (&lt;100 KB / &lt;200 KB) dan konversi JPG/WebP/PNG.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 12 -->
+                <button type="button" class="bento-card" data-open-tool="imgtopdf" data-tool-cat="siber" data-tool-keywords="foto ke pdf gabung gambar ktp dokumen tugas a4 scanner">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
+                      </span>
+                      <span class="bento-tag">PDF 1.4 Lokal</span>
+                    </div>
+                    <div class="bento-title">Gabung Foto ke Dokumen PDF</div>
+                    <div class="bento-desc">Satukan beberapa foto dokumen, catatan, atau identitas menjadi satu berkas PDF A4 langsung di peramban.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 13 -->
+                <button type="button" class="bento-card" data-open-tool="aiimage" data-tool-cat="ai" data-tool-keywords="ai image generator buat gambar dari teks anime 3d poster">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                      </span>
+                      <span class="bento-tag tag-ai">Text-to-Image</span>
+                    </div>
+                    <div class="bento-title">AI Image Generator HD</div>
+                    <div class="bento-desc">Hasilkan ilustrasi 3D, fotografi realistis, atau vektor dari deskripsi teks dalam rasio 1:1, 9:16, dan 16:9.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 14 -->
+                <button type="button" class="bento-card" data-open-tool="roaster" data-tool-cat="ai" data-tool-keywords="ai roaster roasting aura akun tiktok komedi fyp kartu">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                      </span>
+                      <span class="bento-tag tag-ai">Profil + Kartu</span>
+                    </div>
+                    <div class="bento-title">AI Roaster &amp; Skor Aura TikTok</div>
+                    <div class="bento-desc">Evaluasi statistik akun TikTok publik dengan komentar komedi AI dan ekspor kartu skor resolusi tinggi.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 15 -->
+                <button type="button" class="bento-card" data-open-tool="stalker" data-tool-cat="sosmed" data-tool-keywords="stalker cek profil tiktok saluran wa followers avatar hd">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                      </span>
+                      <span class="bento-tag">Analitik</span>
+                    </div>
+                    <div class="bento-title">Analitik Profil TikTok &amp; Saluran WA</div>
+                    <div class="bento-desc">Tinjau metrik pengikut, total suka, bio, serta unduh avatar asli dari akun TikTok maupun Saluran WhatsApp.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 16 -->
+                <button type="button" class="bento-card" data-open-tool="generator" data-tool-cat="kreator" data-tool-keywords="stiker komentar tiktok transparan quoted wa fake chat iphone">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 22l4-4h6"/></svg>
+                      </span>
+                      <span class="bento-tag">Overlay PNG</span>
+                    </div>
+                    <div class="bento-title">Stiker Komentar TikTok &amp; Mockup Chat</div>
+                    <div class="bento-desc">Buat aset balasan komentar TikTok latar transparan untuk editor video, stiker kutipan WA, dan mockup percakapan.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 17 -->
+                <button type="button" class="bento-card" data-open-tool="receipt" data-tool-cat="kreator" data-tool-keywords="struk kasir estetik receiptify kartu lirik spotify story">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l3-2 3 2 2-2 2 2 3-2 3 2V2l-3 2-3-2-2 2-2-2-3 2-3-2z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/></svg>
+                      </span>
+                      <span class="bento-tag">Visual Grafis</span>
+                    </div>
+                    <div class="bento-title">Struk Thermal &amp; Kartu Lirik Lagu</div>
+                    <div class="bento-desc">Susun daftar putar menjadi cetakan struk kasir ber-barcode atau cari lirik otomatis ke dalam kartu tipografi.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 18 -->
+                <button type="button" class="bento-card" data-open-tool="mlbbwr" data-tool-cat="siber" data-tool-keywords="mlbb mobile legends winrate wr kalkulator winstreak game">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                      </span>
+                      <span class="bento-tag">Kalkulasi</span>
+                    </div>
+                    <div class="bento-title">Kalkulator Target Winrate MLBB</div>
+                    <div class="bento-desc">Hitung presisi jumlah kemenangan beruntun tanpa kalah yang dibutuhkan untuk mencapai persentase Winrate target.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 19 -->
+                <button type="button" class="bento-card" data-open-tool="osint" data-tool-cat="siber" data-tool-keywords="osint detektif lacak username sosmed github tiktok reddit roblox">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                      </span>
+                      <span class="bento-tag tag-cyber">OSINT 16 Situs</span>
+                    </div>
+                    <div class="bento-title">Pencari Jejak Username (OSINT)</div>
+                    <div class="bento-desc">Periksa ketersediaan dan jejak akun satu username secara paralel di 16 platform komunitas, kode, dan sosial.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 20 -->
+                <button type="button" class="bento-card" data-open-tool="pixelvault" data-tool-cat="siber" data-tool-keywords="steganografi pixel vault pesan rahasia foto enkripsi password">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      </span>
+                      <span class="bento-tag tag-cyber">LSB Stego</span>
+                    </div>
+                    <div class="bento-title">Pixel Vault — Steganografi Citra</div>
+                    <div class="bento-desc">Sisipkan dan kunci pesan teks terenkripsi ke dalam bit piksel berkas PNG secara lokal tanpa mengubah visual foto.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+
+                <!-- 21 -->
+                <button type="button" class="bento-card" data-open-tool="cyberutil" data-tool-cat="siber" data-tool-keywords="anti phishing bongkar shortlink ip server qr code logo">
+                  <div>
+                    <div class="bento-top">
+                      <span class="bento-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                      </span>
+                      <span class="bento-tag tag-cyber">Jaringan &amp; QR</span>
+                    </div>
+                    <div class="bento-title">Inspektur Tautan, Shortlink &amp; QR</div>
+                    <div class="bento-desc">Lacak rantai pengalihan tautan mencurigakan beserta lokasi IP server, ringkas URL panjang, dan cetak kode QR.</div>
+                  </div>
+                  <span class="bento-cta"><span>Buka perangkat</span><span>&rarr;</span></span>
+                </button>
+              </div>
+
+              <div id="homeEmptySearch" class="empty-box hidden mt-md">
+                Tidak ada perangkat yang cocok dengan filter atau pencarian saat ini.
+              </div>
+            </div>
+          </section>
+
+      <!-- =================================================================
+           TOOL 1: REACTION SALURAN WHATSAPP (+ Sub-menu Riwayat & Mode API)
+           ================================================================= -->
+      <section class="view" id="view-send">
+        <div class="subnav-row">
+          <button class="nav-pill active" data-subview="send">Kirim Reaction</button>
+          <button class="nav-pill" data-subview="history">
+            Riwayat <span class="count-pill hidden" id="runningBadge">0</span>
+          </button>
+          <button class="nav-pill" data-subview="settings">Konfigurasi Server</button>
+        </div>
+
+        <div class="hero-header">
+          <h1>Reaction Saluran WhatsApp</h1>
+          <p>Masukkan tautan postingan saluran, tentukan kombinasi emoji, lalu jalankan pengiriman otomatis melalui pool server publik.</p>
+        </div>
+
+        <form id="campaignForm" class="card main-form-card">
+          <div class="step-section">
+            <div class="step-label-row">
+              <div class="step-title">
+                <span class="step-num">1</span>
+                <label for="linksTextarea">Tautan Postingan Saluran</label>
+              </div>
+              <button type="button" class="text-btn" id="btnValidateLinks">Verifikasi Tautan</button>
+            </div>
+
+            <textarea
+              id="linksTextarea"
+              class="input textarea"
+              rows="3"
+              placeholder="Contoh: https://whatsapp.com/channel/0029Va.../125&#10;(Mendukung banyak tautan sekaligus, pisahkan per baris)"
+              required
+            ></textarea>
+            <div class="helper-line">
+              <span>Buka Saluran WhatsApp &rarr; tahan pada postingan &rarr; pilih <strong>Salin tautan</strong>.</span>
+            </div>
+
+            <div id="linkPreviewPanel" class="preview-box hidden"></div>
+          </div>
+
+          <hr class="divider" />
+
+          <div class="step-section">
+            <div class="step-label-row">
+              <div class="step-title">
+                <span class="step-num">2</span>
+                <label>Kombinasi Emoji Reaction</label>
+              </div>
+              <span class="selected-pill" id="emojiCounterLabel">5 emoji dipilih</span>
+            </div>
+
+            <div class="preset-bar">
+              <button type="button" class="chip" data-preset="viral">Preset Populer</button>
+              <button type="button" class="chip" data-preset="positif">Preset Apresiasi</button>
+              <button type="button" class="chip" data-preset="hype">Preset Ekspresif</button>
+              <button type="button" class="chip chip-ghost" data-preset="clear">Kosongkan</button>
+            </div>
+
+            <div class="emoji-picker-grid" id="emojiSelectorGrid"></div>
+
+            <div class="custom-emoji-row">
+              <input
+                type="text"
+                id="customEmojiInput"
+                class="input input-sm"
+                placeholder="Tambahkan emoji kustom (misal: 🫡 💎 ⚡)"
+              />
+              <button type="button" class="btn btn-secondary btn-sm" id="btnAddCustomEmoji">Tambah</button>
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <div class="step-section">
+            <div class="engine-info-bar" id="freePoolNotice">
+              <div class="engine-info-left">
+                <span class="free-badge">AKTIF</span>
+                <span id="activeEngineText">Menggunakan Pool Server Publik Otomatis</span>
+              </div>
+              <button type="button" class="link-inline" id="btnToggleAdvanced">Pengaturan Lanjutan</button>
+            </div>
+
+            <div id="advancedOptionsBox" class="advanced-box hidden">
+              <div class="grid-2">
+                <div class="field">
+                  <label for="campaignName">Label Pengiriman (Opsional)</label>
+                  <input type="text" id="campaignName" class="input input-sm" placeholder="Contoh: Pengumuman Pagi" />
+                </div>
+                <div class="field">
+                  <label for="campaignProvider">Sumber Server</label>
+                  <select id="campaignProvider" class="input input-sm"></select>
+                </div>
+              </div>
+
+              <div id="paidServiceRow" class="grid-3 mt-sm hidden">
+                <div class="field">
+                  <label for="campaignService">Layanan Panel</label>
+                  <select id="campaignService" class="input input-sm"></select>
+                </div>
+                <div class="field">
+                  <label for="qtyPerEmoji">Jumlah / Emoji</label>
+                  <input type="number" id="qtyPerEmoji" class="input input-sm" min="1" max="100000" value="50" />
+                </div>
+                <div class="field">
+                  <label for="delaySec">Jeda Antar Kirim (dtk)</label>
+                  <input type="number" id="delaySec" class="input input-sm" min="0" max="60" value="1" />
+                </div>
+              </div>
+
+              <div class="field mt-sm" id="freeDelayRow">
+                <label for="delayMs">Jeda Antar Tautan (detik) — disarankan 2–4 detik untuk pengiriman massal</label>
+                <input type="number" id="delayMs" class="input input-sm" min="0" max="60" value="2" />
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-submit" id="btnLaunchCampaign">
+              Jalankan Pengiriman Reaction
+            </button>
+          </div>
+        </form>
+
+        <div id="recentActivityBox" class="recent-section hidden">
+          <div class="section-head">
+            <h2>Pengiriman Terbaru</h2>
+            <button type="button" class="text-btn" id="btnSeeAllHistory">Lihat Semua &rarr;</button>
+          </div>
+          <div id="recentCampaignList" class="campaign-stack"></div>
+        </div>
+      </section>
+
+      <!-- SUBVIEW 1B: RIWAYAT REACTION -->
+      <section class="view" id="view-history">
+        <div class="subnav-row">
+          <button class="nav-pill" data-subview="send">Kirim Reaction</button>
+          <button class="nav-pill active" data-subview="history">Riwayat</button>
+          <button class="nav-pill" data-subview="settings">Konfigurasi Server</button>
+        </div>
+
+        <div class="section-head-page">
+          <div>
+            <h1>Riwayat Pengiriman</h1>
+            <p>Pantau progres pengiriman reaction ke postingan saluran Anda secara langsung.</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="btnClearFinished">Bersihkan Selesai</button>
+        </div>
+
+        <div class="stats-strip">
+          <div class="stat-pill-card">
+            <span class="stat-lbl">Berhasil Terkirim</span>
+            <strong class="stat-num text-brand" id="statReactionsSent">0</strong>
+          </div>
+          <div class="stat-pill-card">
+            <span class="stat-lbl">Sedang Diproses</span>
+            <strong class="stat-num" id="statRunning">0</strong>
+          </div>
+          <div class="stat-pill-card">
+            <span class="stat-lbl">Tingkat Sukses</span>
+            <strong class="stat-num" id="statSuccessRate">100%</strong>
+          </div>
+        </div>
+
+        <div id="activeCampaignsList" class="campaign-stack"></div>
+
+        <details class="log-accordion">
+          <summary>
+            <span>Catatan Teknis Server</span>
+            <button type="button" class="text-btn" id="btnClearLogs">Hapus Log</button>
+          </summary>
+          <div class="log-list" id="liveLogContainer"></div>
+        </details>
+      </section>
+
+      <!-- SUBVIEW 1C: MODE API -->
+      <section class="view" id="view-settings">
+        <div class="subnav-row">
+          <button class="nav-pill" data-subview="send">Kirim Reaction</button>
+          <button class="nav-pill" data-subview="history">Riwayat</button>
+          <button class="nav-pill active" data-subview="settings">Konfigurasi Server</button>
+        </div>
+
+        <div class="section-head-page">
+          <div>
+            <h1>Konfigurasi Sumber Server</h1>
+            <p>Secara bawaan sistem memakai <strong>Pool Server Publik Otomatis</strong>. Anda juga dapat menambahkan endpoint SMM atau webhook kustom.</p>
+          </div>
+        </div>
+
+        <div class="card mb-md">
+          <div class="section-head">
+            <h2>Daftar Sumber Server</h2>
+          </div>
+          <div id="providersList" class="provider-stack"></div>
+        </div>
+
+        <details class="card accordion-card">
+          <summary class="accordion-title">+ Tambah Endpoint / Panel API Kustom</summary>
+          <form id="providerForm" class="mt-md">
+            <input type="hidden" id="providerId" />
+            <div class="grid-2">
+              <div class="field">
+                <label for="providerName">Nama Koneksi</label>
+                <input type="text" id="providerName" class="input" placeholder="Contoh: Panel SMM Saya" required />
+              </div>
+              <div class="field">
+                <label for="providerType">Tipe Koneksi</label>
+                <select id="providerType" class="input">
+                  <option value="free_pool">Gratis — Public Reaction Pool (Tanpa API Key)</option>
+                  <option value="smm_v2">Panel SMM Standar (API Key)</option>
+                  <option value="custom_webhook">Direct API / Webhook Kustom</option>
+                  <option value="demo">Simulasi Offline (Tes UI)</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="smmFields" class="mt-sm hidden">
+              <div class="grid-2">
+                <div class="field">
+                  <label for="providerApiUrl">URL Endpoint API</label>
+                  <input type="url" id="providerApiUrl" class="input" placeholder="https://domainpanel.com/api/v2" />
+                </div>
+                <div class="field">
+                  <label for="providerApiKey">API Key</label>
+                  <input type="password" id="providerApiKey" class="input" placeholder="Masukkan API Key" />
+                </div>
+              </div>
+              <div class="field mt-sm">
+                <label for="providerDefaultService">ID Layanan Default (Opsional)</label>
+                <input type="text" id="providerDefaultService" class="input" placeholder="Contoh: 4182" />
+              </div>
+            </div>
+
+            <div id="webhookFields" class="mt-sm hidden">
+              <div class="grid-2">
+                <div class="field">
+                  <label for="webhookUrl">URL Endpoint POST</label>
+                  <input type="url" id="webhookUrl" class="input" placeholder="https://api-anda.com/wa/react" />
+                </div>
+                <div class="field">
+                  <label for="webhookAuth">Header Authorization (Opsional)</label>
+                  <input type="password" id="webhookAuth" class="input" placeholder="Bearer token..." />
+                </div>
+              </div>
+            </div>
+
+            <div class="btn-row mt-md">
+              <button type="submit" class="btn btn-primary">Simpan Server</button>
+              <button type="button" class="btn btn-secondary hidden" id="btnResetProviderForm">Batal</button>
+            </div>
+          </form>
+        </details>
+      </section>
+
+      <!-- =================================================================
+           TOOL 2: YOUTUBE TO MP3 CONVERTER (64 - 320 KBPS)
+           ================================================================= -->
+      <section class="view" id="view-ytmp3">
+        <div class="hero-header">
+          <h1>YouTube ke MP3 Converter (Multi-Kualitas)</h1>
+          <p>Tempel link YouTube atau ketik judul lagu langsung, atur bitrate kualitas audio dari 64 kbps hingga 320 kbps Ultra Hi-Fi.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <form id="ytMp3Form">
+            <div class="step-section">
+              <div class="step-label-row">
+                <div class="step-title">
+                  <span class="step-num">1</span>
+                  <label for="ytInput">Link Video YouTube atau Judul Lagu</label>
+                </div>
+                <div style="display:flex; gap:0.35rem;">
+                  <button type="button" class="text-btn" id="btnPasteYt">Tempel URL</button>
+                  <button type="button" class="text-btn" id="btnSearchYtOnly">Cari Judul</button>
+                </div>
+              </div>
+
+              <input
+                type="text"
+                id="ytInput"
+                class="input"
+                placeholder="Tempel tautan youtube.com / youtu.be / Shorts atau ketik judul lagu..."
+                required
+              />
+              <div class="helper-line">
+                <span>Tempel tautan langsung untuk konversi instan, atau ketik nama lagu/artis untuk memilih dari daftar video.</span>
+              </div>
+
+              <div id="ytSearchResults" class="hidden"></div>
+            </div>
+
+            <hr class="divider" />
+
+            <div class="step-section">
+              <div class="step-label-row">
+                <div class="step-title">
+                  <span class="step-num">2</span>
+                  <label>Bitrate Audio MP3</label>
+                </div>
+                <span class="selected-pill" id="ytSelectedQualityBadge">192 kbps dipilih</span>
+              </div>
+
+              <div class="quality-grid" id="ytQualityGrid">
+                <button type="button" class="quality-card" data-yt-kbps="64">
+                  <span class="quality-kbps">64 kbps</span>
+                  <span class="quality-desc">Hemat Data &bull; Suara/Podcast</span>
+                </button>
+                <button type="button" class="quality-card" data-yt-kbps="96">
+                  <span class="quality-kbps">96 kbps</span>
+                  <span class="quality-desc">Ukuran Ringan &bull; Cepat</span>
+                </button>
+                <button type="button" class="quality-card" data-yt-kbps="128">
+                  <span class="quality-kbps">128 kbps</span>
+                  <span class="quality-desc">Standar Musik &bull; Kompak</span>
+                </button>
+                <button type="button" class="quality-card active" data-yt-kbps="192">
+                  <span class="quality-kbps">192 kbps &bull; Direkomendasikan</span>
+                  <span class="quality-desc">Keseimbangan kualitas &amp; ukuran</span>
+                </button>
+                <button type="button" class="quality-card" data-yt-kbps="256">
+                  <span class="quality-kbps">256 kbps</span>
+                  <span class="quality-desc">Kualitas Tinggi &bull; Studio</span>
+                </button>
+                <button type="button" class="quality-card" data-yt-kbps="320">
+                  <span class="quality-kbps">320 kbps &bull; Hi-Fi</span>
+                  <span class="quality-desc">Bitrate maksimal MP3</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-submit mt-md" id="btnRunYtMp3">
+              Konversi &amp; Siapkan MP3
+            </button>
+          </form>
+
+          <div id="ytMp3Result" class="hidden"></div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 3: TIKTOK & SOSMED DOWNLOADER TANPA WATERMARK
+           ================================================================= -->
+      <section class="view" id="view-downloader">
+        <div class="hero-header">
+          <h1>Downloader TikTok &amp; Sosial Media HD</h1>
+          <p>Simpan video TikTok tanpa tanda air, galeri slide foto, trek audio MP3, serta Reels dalam kualitas sumber asli.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <form id="downloaderForm">
+            <div class="step-label-row">
+              <div class="step-title">
+                <span class="step-num">1</span>
+                <label for="dlUrlInput">Tautan Video atau Slide Foto</label>
+              </div>
+              <button type="button" class="text-btn" id="btnPasteDl">Tempel Clipboard</button>
+            </div>
+
+            <input
+              type="url"
+              id="dlUrlInput"
+              class="input"
+              placeholder="Contoh: https://vt.tiktok.com/ZS... atau https://www.tiktok.com/@user/video/..."
+              required
+            />
+            <div class="helper-line">
+              <span>Mendukung tautan publik TikTok (video &amp; slide foto), Instagram Reels, dan Facebook Video.</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-submit mt-md" id="btnRunDownloader">
+              Ekstrak Media Tanpa Watermark
+            </button>
+          </form>
+
+          <div id="downloaderResult" class="hidden"></div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 4: STALKER PROFIL TIKTOK & CEK SALURAN WA
+           ================================================================= -->
+      <section class="view" id="view-stalker">
+        <div class="hero-header">
+          <h1>Analitik Profil TikTok &amp; Saluran WhatsApp</h1>
+          <p>Periksa statistik publik akun TikTok atau tinjau informasi pengikut serta foto profil resolusi penuh Saluran WhatsApp.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <div>
+            <div class="seg-switch">
+              <button type="button" class="seg-item active" data-stalk-mode="tiktok">Profil TikTok</button>
+              <button type="button" class="seg-item" data-stalk-mode="wa">Saluran WhatsApp</button>
+            </div>
+          </div>
+
+          <form id="stalkTikTokForm">
+            <div class="step-label-row">
+              <div class="step-title">
+                <span class="step-num">1</span>
+                <label for="stalkTikTokInput">Username TikTok</label>
+              </div>
+              <button type="button" class="text-btn" id="btnTryD4TechTikTok">Contoh: @df4tch_</button>
+            </div>
+            <input
+              type="text"
+              id="stalkTikTokInput"
+              class="input"
+              placeholder="Masukkan username (contoh: df4tch_ atau @tiktok)"
+              required
+            />
+            <button type="submit" class="btn btn-primary btn-submit mt-md" id="btnRunStalkTikTok">
+              Tampilkan Statistik Profil
+            </button>
+          </form>
+
+          <form id="stalkWaForm" class="hidden">
+            <div class="step-label-row">
+              <div class="step-title">
+                <span class="step-num">1</span>
+                <label for="stalkWaInput">Tautan Saluran WhatsApp</label>
+              </div>
+            </div>
+            <input
+              type="url"
+              id="stalkWaInput"
+              class="input"
+              placeholder="Contoh: https://whatsapp.com/channel/0029Va..."
+              required
+            />
+            <button type="submit" class="btn btn-primary btn-submit mt-md" id="btnRunStalkWa">
+              Tampilkan Informasi Saluran
+            </button>
+          </form>
+
+          <div id="stalkerResult" class="hidden"></div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 5: AI ROASTER & CEK SKOR AURA AKUN TIKTOK
+           ================================================================= -->
+      <section class="view" id="view-roaster">
+        <div class="hero-header">
+          <h1>AI Roaster &amp; Skor Aura TikTok</h1>
+          <p>Analisis profil publik TikTok dengan tiga gaya pembacaan AI dan ekspor kartu visual beresolusi tinggi.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <form id="roasterForm">
+            <div class="step-label-row">
+              <div class="step-title">
+                <span class="step-num">1</span>
+                <label for="roastUserInput">Username TikTok Target</label>
+              </div>
+              <button type="button" class="text-btn" id="btnTryRoastSelf">Contoh: @df4tch_</button>
+            </div>
+            <input
+              type="text"
+              id="roastUserInput"
+              class="input"
+              placeholder="Contoh: df4tch_ atau username publik lainnya"
+              required
+            />
+
+            <div class="step-label-row mt-md">
+              <div class="step-title">
+                <span class="step-num">2</span>
+                <label>Gaya Komentar AI</label>
+              </div>
+            </div>
+            <div class="seg-switch">
+              <button type="button" class="seg-item active" data-roast-mode="savage">Kritik Tajam</button>
+              <button type="button" class="seg-item" data-roast-mode="tongkrongan">Humor Santai</button>
+              <button type="button" class="seg-item" data-roast-mode="aura">Analisis Skor Aura</button>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-submit" id="btnRunRoaster">
+              Analisis &amp; Buat Kartu Visual
+            </button>
+          </form>
+
+          <div id="roasterResultBox" class="hidden">
+            <hr class="divider" />
+            <div class="step-label-row">
+              <span style="font-size:0.84rem; font-weight:600;">Pratinjau Kartu Hasil (900&times;580):</span>
+              <button type="button" class="btn btn-primary btn-sm" id="btnDownloadRoastCard">
+                Unduh Kartu PNG
+              </button>
+            </div>
+            <div class="checkerboard-stage">
+              <canvas id="roastCardCanvas" width="900" height="580"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 6: AI PENJERNIH FOTO HD (REMINI) + SLIDER BEFORE/AFTER
+           ================================================================= -->
+      <section class="view" id="view-remini">
+        <div class="hero-header">
+          <h1>Penjernih Foto HD (AI Upscaler)</h1>
+          <p>Tingkatkan ketajaman wajah dan detail citra beresolusi rendah menggunakan model restorasi berbasis GPU.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <input type="file" id="reminiFileInput" accept="image/*" class="hidden" />
+          <div class="upload-dropzone" id="reminiDropzone">
+            <div class="dropzone-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="dropzone-title" id="reminiDropTitle">Klik atau seret berkas foto ke area ini</div>
+            <div class="dropzone-sub">Mendukung potret wajah, ilustrasi, maupun arsip foto lama (JPG, PNG, WebP)</div>
+          </div>
+
+          <div id="reminiActionRow" class="btn-row mt-md hidden">
+            <button type="button" class="btn btn-primary" id="btnRunRemini">
+              Proses Restorasi HD
+            </button>
+            <button type="button" class="btn btn-secondary" id="btnReminiChange">Ganti Berkas</button>
+          </div>
+
+          <div id="reminiResultStage" class="hidden">
+            <hr class="divider" />
+            <div class="step-label-row">
+              <span style="font-size:0.84rem; font-weight:600;">Perbandingan Sebelum &amp; Sesudah:</span>
+              <div style="display:flex; gap:0.45rem; flex-wrap:wrap;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btnChainReminiToBg">
+                  Lanjut Hapus Background &rarr;
+                </button>
+                <a id="btnDownloadRemini" href="#" download="d4tech-hd-remini.png" class="btn btn-primary btn-sm">
+                  Unduh Foto HD
+                </a>
+              </div>
+            </div>
+
+            <div class="ba-compare-wrap" id="baCompareWrap">
+              <img id="reminiBeforeImg" src="" alt="Sebelum" />
+              <div class="ba-after-layer" id="reminiAfterLayer" style="clip-path: inset(0 0 0 50%);">
+                <img id="reminiAfterImg" src="" alt="Sesudah HD" />
+              </div>
+            </div>
+            <input type="range" id="reminiCompareSlider" class="ba-slider-range" min="0" max="100" value="50" />
+            <div style="display:flex; justify-content:space-between; font-size:0.74rem; color:var(--text-muted); font-weight:600;">
+              <span>&larr; Citra Asli</span>
+              <span>Hasil Restorasi HD &rarr;</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 7: AI IMAGE GENERATOR (TEXT TO IMAGE HD)
+           ================================================================= -->
+      <section class="view" id="view-aiimage">
+        <div class="hero-header">
+          <h1>AI Image Generator (Teks ke Gambar)</h1>
+          <p>Tulis deskripsi visual dalam Bahasa Indonesia atau Inggris, tentukan arah artistik serta rasio bidang, lalu unduh tanpa watermark.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <form id="aiImageForm">
+            <div class="field">
+              <label for="aiPromptInput">Deskripsi Visual (Prompt)</label>
+              <textarea
+                id="aiPromptInput"
+                class="input textarea"
+                rows="3"
+                placeholder="Contoh: Arsitektur perpustakaan minimalis berlampu hangat di tengah hutan pinus berkabut, pencahayaan pagi sinematik"
+                required
+              ></textarea>
+            </div>
+
+            <div class="grid-2 mt-sm">
+              <div class="field">
+                <label for="aiStyleSelect">Gaya Artistik</label>
+                <select id="aiStyleSelect" class="input input-sm">
+                  <option value="cinematic 3d render, octane render, 8k">3D Render Sinematik</option>
+                  <option value="anime masterpiece, makoto shinkai style, vibrant">Ilustrasi Anime Modern</option>
+                  <option value="photorealistic photography, 85mm lens, sharp focus">Fotografi Realistis 85mm</option>
+                  <option value="cyberpunk neon futuristic digital art">Digital Art Futuristik</option>
+                  <option value="minimalist vector logo flat illustration">Ilustrasi Vektor Minimalis</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="aiRatioSelect">Rasio Bidang</label>
+                <select id="aiRatioSelect" class="input input-sm">
+                  <option value="1:1">1:1 Persegi (1024&times;1024)</option>
+                  <option value="9:16">9:16 Vertikal (Story / Reels)</option>
+                  <option value="16:9">16:9 Lanskap (Presentasi / YouTube)</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-submit mt-md" id="btnRunAiImage">
+              Hasilkan Gambar
+            </button>
+          </form>
+
+          <div id="aiImageResult" class="hidden"></div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 8: HAPUS BACKGROUND FOTO AI & PASFOTO
+           ================================================================= -->
+      <section class="view" id="view-removebg">
+        <div class="hero-header">
+          <h1>Hapus Background &amp; Studio Pasfoto</h1>
+          <p>Pisahkan subjek dari latar belakang secara otomatis, lalu unduh sebagai PNG transparan atau terapkan warna latar standar dokumen.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <input type="file" id="bgFileInput" accept="image/*" class="hidden" />
+          <div class="upload-dropzone" id="bgDropzone">
+            <div class="dropzone-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            </div>
+            <div class="dropzone-title" id="bgDropTitle">Klik atau seret foto ke area ini</div>
+            <div class="dropzone-sub">Mendukung format JPG, PNG, dan WebP</div>
+          </div>
+
+          <div id="bgActionRow" class="btn-row mt-md hidden">
+            <button type="button" class="btn btn-primary" id="btnProcessRemoveBg">
+              Hapus Latar Belakang
+            </button>
+            <button type="button" class="btn btn-secondary" id="btnChooseOtherPhoto">
+              Ganti Foto
+            </button>
+          </div>
+
+          <div id="bgEditorStage" class="hidden">
+            <hr class="divider" />
+            <div class="step-label-row">
+              <span style="font-size:0.84rem; font-weight:600;">Warna Latar Belakang:</span>
+              <button type="button" class="btn btn-primary btn-sm" id="btnDownloadBgResult">
+                Unduh PNG HD
+              </button>
+            </div>
+
+            <div class="swatch-row" id="bgSwatchRow">
+              <button type="button" class="swatch-btn active" data-bg-color="transparent">Transparan</button>
+              <button type="button" class="swatch-btn" data-bg-color="#db1514">
+                <span class="swatch-dot" style="background:#db1514;"></span> Merah Pasfoto
+              </button>
+              <button type="button" class="swatch-btn" data-bg-color="#0054a6">
+                <span class="swatch-dot" style="background:#0054a6;"></span> Biru Pasfoto
+              </button>
+              <button type="button" class="swatch-btn" data-bg-color="#ffffff">
+                <span class="swatch-dot" style="background:#ffffff;"></span> Putih Bersih
+              </button>
+              <button type="button" class="swatch-btn" data-bg-color="#111827">
+                <span class="swatch-dot" style="background:#111827;"></span> Hitam Pekat
+              </button>
+              <label class="swatch-btn" style="cursor:pointer;">
+                Kustom
+                <input type="color" id="bgCustomColorPicker" value="#067647" style="width:18px; height:18px; border:none; background:none; padding:0; cursor:pointer;" />
+              </label>
+            </div>
+
+            <div class="checkerboard-stage">
+              <canvas id="bgResultCanvas" width="800" height="800"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 9: STUDIO AUDIO 8D, SLOWED + REVERB & BASS BOOSTER
+           ================================================================= -->
+      <section class="view" id="view-audiostudio">
+        <div class="hero-header">
+          <h1>Studio Audio 8D, Slowed + Reverb &amp; Bass</h1>
+          <p>Muat berkas audio dari perangkat Anda untuk memantau pemrosesan sinyal secara langsung dan mengekspor berkas WAV.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <input type="file" id="audioStudioFile" accept="audio/*" class="hidden" />
+          <div class="upload-dropzone" id="audioStudioDropzone">
+            <div class="dropzone-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            </div>
+            <div class="dropzone-title" id="audioStudioTitle">Pilih berkas audio (MP3, WAV, M4A)</div>
+            <div class="dropzone-sub">Seluruh pemrosesan DSP berjalan lokal di peramban perangkat Anda</div>
+          </div>
+
+          <div id="audioStudioControls" class="hidden">
+            <hr class="divider" />
+            <div class="step-label-row">
+              <span style="font-size:0.84rem; font-weight:600;">Karakter Efek Audio:</span>
+              <span class="selected-pill" id="audioPresetLabel">8D Surround Aktif</span>
+            </div>
+
+            <div class="quality-grid mt-sm">
+              <button type="button" class="quality-card active" data-audio-fx="8d">
+                <span class="quality-kbps">8D Spatial Panning</span>
+                <span class="quality-desc">Rotasi stereo otomatis mengelilingi pendengar</span>
+              </button>
+              <button type="button" class="quality-card" data-audio-fx="slowed">
+                <span class="quality-kbps">Slowed + Reverb</span>
+                <span class="quality-desc">Tempo 0.84x dengan ruang gema konvolusi</span>
+              </button>
+              <button type="button" class="quality-card" data-audio-fx="nightcore">
+                <span class="quality-kbps">Nightcore (1.22x)</span>
+                <span class="quality-desc">Peningkatan tempo &amp; nada enerjik</span>
+              </button>
+              <button type="button" class="quality-card" data-audio-fx="bass">
+                <span class="quality-kbps">Sub-Bass Boost</span>
+                <span class="quality-desc">Penguatan frekuensi rendah di bawah 110 Hz</span>
+              </button>
+            </div>
+
+            <div class="viz-box">
+              <canvas id="audioVizCanvas" class="viz-canvas" width="700" height="120"></canvas>
+              <div class="btn-row mt-sm" style="justify-content:space-between;">
+                <div style="display:flex; gap:0.45rem;">
+                  <button type="button" class="btn btn-primary btn-sm" id="btnAudioPlayPause">Putar Pratinjau</button>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btnAudioChangeFile">Ganti Berkas</button>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" id="btnExportAudioWav">
+                  Render &amp; Unduh WAV
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 10: STUDIO NARATOR DRACIN, AI NATURAL & MULTI-BAHASA TTS
+           ================================================================= -->
+      <section class="view" id="view-tts">
+        <div class="hero-header">
+          <h1>Studio Narator Cerita Dracin &amp; AI TTS</h1>
+          <p>Ubah naskah cerita atau narasi video menjadi berkas suara MP3 siap pakai untuk penyuntingan video.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <div>
+            <div class="seg-switch">
+              <button type="button" class="seg-item active" data-tts-engine="dracin">Narator Dracin + BGM</button>
+              <button type="button" class="seg-item" data-tts-engine="gemini">Suara Natural Gemini</button>
+              <button type="button" class="seg-item" data-tts-engine="google">Multi-Bahasa (7 Bahasa)</button>
+            </div>
+          </div>
+
+          <form id="ttsForm">
+            <div class="field">
+              <label for="ttsTextInput">Naskah Narasi (Maksimal 1.500 karakter)</label>
+              <textarea
+                id="ttsTextInput"
+                class="input textarea"
+                rows="4"
+                placeholder="Tanpa disangka oleh seluruh tamu pesta, pria sederhana yang mereka remehkan itu ternyata adalah pemilik saham terbesar perusahaan!"
+                required
+              >Tanpa disangka oleh seluruh tamu pesta, pria sederhana yang mereka remehkan itu ternyata adalah pemilik saham terbesar perusahaan!</textarea>
+            </div>
+
+            <div class="grid-2 mt-sm" id="ttsDracinControls">
+              <div class="field">
+                <label for="ttsSpeedSelect">Kecepatan Bicara</label>
+                <select id="ttsSpeedSelect" class="input input-sm">
+                  <option value="1.0" selected>1.0x — Normal Dramatis</option>
+                  <option value="1.1">1.1x — Cepat Khas Rekap</option>
+                  <option value="1.2">1.2x — Padat &amp; Cepat</option>
+                  <option value="0.9">0.9x — Tenang Bercerita</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="ttsMusicSelect">Musik Latar (BGM)</label>
+                <select id="ttsMusicSelect" class="input input-sm">
+                  <option value="true" selected>Sertakan Musik Latar Dramatis</option>
+                  <option value="false">Hanya Vokal Bersih</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field mt-sm hidden" id="ttsLangWrap">
+              <label for="ttsLangSelect">Bahasa &amp; Logat</label>
+              <select id="ttsLangSelect" class="input input-sm">
+                <option value="id">Bahasa Indonesia</option>
+                <option value="en">English (US)</option>
+                <option value="ja">Japanese (日本語)</option>
+                <option value="ko">Korean (한국어)</option>
+                <option value="ar">Arabic (العربية)</option>
+                <option value="jv">Bahasa Jawa</option>
+                <option value="su">Bahasa Sunda</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-submit mt-md" id="btnRunTts">
+              Render Audio MP3
+            </button>
+          </form>
+
+          <div id="ttsResultBox" class="hidden"></div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 11: GENERATOR STIKER KOMENTAR TIKTOK, QUOTED WA & FAKE CHAT
+           ================================================================= -->
+      <section class="view" id="view-generator">
+        <div class="hero-header">
+          <h1>Stiker Komentar TikTok &amp; Mockup Percakapan</h1>
+          <p>Susun gambar balasan komentar TikTok latar transparan, kutipan pesan WhatsApp, atau mockup antarmuka chat siap unduh.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <div>
+            <div class="seg-switch">
+              <button type="button" class="seg-item active" data-gen-mode="tiktok_reply">Komentar TikTok</button>
+              <button type="button" class="seg-item" data-gen-mode="wa_quote">Kutipan Chat WA</button>
+              <button type="button" class="seg-item" data-gen-mode="fake_chat">Mockup Layar Chat</button>
+            </div>
+          </div>
+
+          <div id="genSingleControls">
+            <div class="grid-2">
+              <div class="field">
+                <label for="genUsername">Nama / Username Pengirim</label>
+                <input type="text" id="genUsername" class="input input-sm" value="df4tch_" />
+              </div>
+              <div class="field">
+                <label for="genTimeOrSub">Subjudul / Keterangan</label>
+                <input type="text" id="genTimeOrSub" class="input input-sm" value="Membalas komentar df4tch_" />
+              </div>
+            </div>
+
+            <div class="field mt-sm">
+              <label for="genMessage">Isi Komentar / Pesan</label>
+              <textarea id="genMessage" class="input textarea" rows="2">Bisa langsung pakai semua modul di D4Tech Hub tanpa daftar akun.</textarea>
+            </div>
+
+            <div class="grid-2 mt-sm">
+              <div class="field">
+                <label for="genAvatarInput">Foto Profil (Opsional)</label>
+                <input type="file" id="genAvatarInput" class="input input-sm" accept="image/*" />
+              </div>
+              <div class="field hidden" id="waQuoteThemeWrap">
+                <label for="genBubbleTheme">Tema Gelembung</label>
+                <select id="genBubbleTheme" class="input input-sm">
+                  <option value="dark">Mode Gelap</option>
+                  <option value="light">Mode Terang</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="genFakeChatControls" class="hidden">
+            <div class="grid-3">
+              <div class="field">
+                <label for="fcContactName">Nama Kontak</label>
+                <input type="text" id="fcContactName" class="input input-sm" value="Tim D4Tech" />
+              </div>
+              <div class="field">
+                <label for="fcStatusText">Status Kontak</label>
+                <input type="text" id="fcStatusText" class="input input-sm" value="online" />
+              </div>
+              <div class="field">
+                <label for="fcClockTime">Waktu Layar</label>
+                <input type="text" id="fcClockTime" class="input input-sm" value="21:15" />
+              </div>
+            </div>
+
+            <div class="mt-sm">
+              <div class="step-label-row" style="margin-bottom:0.45rem;">
+                <label style="font-size:0.82rem; font-weight:600;">Daftar Balon Percakapan</label>
+                <button type="button" class="text-btn" id="btnAddChatBubble">+ Tambah Baris</button>
+              </div>
+              <div id="fcMessagesContainer"></div>
+            </div>
+          </div>
+
+          <hr class="divider" />
+          <div class="step-label-row">
+            <span style="font-size:0.84rem; font-weight:600;">Pratinjau Kanvas</span>
+            <button type="button" class="btn btn-primary btn-sm" id="btnDownloadCanvas">
+              Unduh PNG
+            </button>
+          </div>
+          <div class="checkerboard-stage">
+            <canvas id="generatorCanvas" width="900" height="420"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 12: GENERATOR STRUK ESTETIK (RECEIPTIFY) & KARTU LIRIK LAGU
+           ================================================================= -->
+      <section class="view" id="view-receipt">
+        <div class="hero-header">
+          <h1>Generator Struk Thermal &amp; Kartu Lirik</h1>
+          <p>Cetak daftar lagu atau catatan menjadi grafis struk kasir lengkap dengan barcode, atau buat kartu tipografi lirik lagu.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <div>
+            <div class="seg-switch">
+              <button type="button" class="seg-item active" data-rcp-mode="receipt">Struk Thermal</button>
+              <button type="button" class="seg-item" data-rcp-mode="lyrics">Kartu Lirik Lagu</button>
+            </div>
+          </div>
+
+          <!-- Controls Struk -->
+          <div id="rcpReceiptControls">
+            <div class="grid-2">
+              <div class="field">
+                <label for="rcpStoreName">Judul Struk</label>
+                <input type="text" id="rcpStoreName" class="input input-sm" value="D4TECH PLAYLIST MART" />
+              </div>
+              <div class="field">
+                <label for="rcpCustomer">Nama / Handle</label>
+                <input type="text" id="rcpCustomer" class="input input-sm" value="@df4tch_" />
+              </div>
+            </div>
+            <div class="field mt-sm">
+              <label for="rcpItemsText">Daftar Baris (Format: Judul | Durasi)</label>
+              <textarea id="rcpItemsText" class="input textarea" rows="4">UNTUNGNYA HIDUP BERJALAN | 03:04
+CINCIN - HINDIA | 04:26
+EVALUASI TENGAH MALAM | 03:15
+KOPI SUSU GULA AREN | 02:45
+NGODING SAMPAI SUBUH | 05:00</textarea>
+            </div>
+            <div class="field mt-sm">
+              <label for="rcpPaperTheme">Tekstur Kertas</label>
+              <select id="rcpPaperTheme" class="input input-sm">
+                <option value="classic">Putih Kertas Kasir</option>
+                <option value="kraft">Cokelat Kraft</option>
+                <option value="pink">Merah Muda Lembut</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Controls Kartu Lirik -->
+          <div id="rcpLyricsControls" class="hidden">
+            <div class="step-label-row">
+              <label style="font-size:0.8rem; font-weight:600;">Pencarian Lirik Otomatis</label>
+            </div>
+            <div class="custom-emoji-row">
+              <input type="text" id="lyrSearchInput" class="input input-sm" placeholder="Ketik judul lagu &amp; penyanyi (contoh: Bernadya Untungnya)" />
+              <button type="button" class="btn btn-primary btn-sm" id="btnSearchLyrics">Cari Lirik</button>
+            </div>
+            <div id="lyrSearchList" class="hidden mt-sm"></div>
+
+            <div class="grid-2 mt-sm">
+              <div class="field">
+                <label for="lyrSongTitle">Judul Lagu</label>
+                <input type="text" id="lyrSongTitle" class="input input-sm" value="Untungnya, Hidup Harus Tetap Berjalan" />
+              </div>
+              <div class="field">
+                <label for="lyrArtistName">Artis / Penyanyi</label>
+                <input type="text" id="lyrArtistName" class="input input-sm" value="Bernadya" />
+              </div>
+            </div>
+            <div class="field mt-sm">
+              <label for="lyrQuoteText">Bait Lirik Pilihan (Disarankan 3–5 baris)</label>
+              <textarea id="lyrQuoteText" class="input textarea" rows="3">Untungnya, bumi masih berputar
+Untungnya, ku tak pilih menyerah
+Untungnya, ku bisa rasa
+Hal-hal baik yang datangnya belakangan</textarea>
+            </div>
+            <div class="field mt-sm">
+              <label for="lyrCardTheme">Palet Kartu</label>
+              <select id="lyrCardTheme" class="input input-sm">
+                <option value="emerald">Forest Emerald</option>
+                <option value="crimson">Deep Crimson</option>
+                <option value="ocean">Slate Ocean</option>
+                <option value="obsidian">Carbon Obsidian</option>
+              </select>
+            </div>
+          </div>
+
+          <hr class="divider" />
+          <div class="step-label-row">
+            <span style="font-size:0.84rem; font-weight:600;">Pratinjau Kanvas:</span>
+            <button type="button" class="btn btn-primary btn-sm" id="btnDownloadRcpCanvas">
+              Unduh PNG
+            </button>
+          </div>
+          <div class="checkerboard-stage">
+            <canvas id="rcpCanvas" width="760" height="960"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 13: DETEKTIF USERNAME OSINT SCANNER (16+ PLATFORM)
+           ================================================================= -->
+      <section class="view" id="view-osint">
+        <div class="hero-header">
+          <h1>Pencari Jejak Username (OSINT)</h1>
+          <p>Periksa keberadaan satu username secara serentak pada 16 platform komunitas, kode sumber, gim, dan sosial media.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <form id="osintForm">
+            <div class="step-label-row">
+              <div class="step-title">
+                <span class="step-num">1</span>
+                <label for="osintUsernameInput">Username Target (Tanpa Spasi)</label>
+              </div>
+              <button type="button" class="text-btn" id="btnTryOsintD4">Contoh: df4tch_</button>
+            </div>
+            <input
+              type="text"
+              id="osintUsernameInput"
+              class="input"
+              placeholder="Contoh: df4tch_ atau torvalds"
+              required
+            />
+            <button type="submit" class="btn btn-primary btn-submit mt-md" id="btnRunOsint">
+              Jalankan Pemindaian 16 Platform
+            </button>
+          </form>
+
+          <div id="osintResultBox" class="hidden"></div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 14: PIXEL VAULT — STEGANOGRAFI PESAN RAHASIA DI FOTO
+           ================================================================= -->
+      <section class="view" id="view-pixelvault">
+        <div class="hero-header">
+          <h1>Pixel Vault — Steganografi Citra PNG</h1>
+          <p>Sembunyikan pesan teks terenkripsi kata sandi ke dalam bit piksel berkas PNG secara lokal tanpa mengubah tampilan gambar.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <div>
+            <div class="seg-switch">
+              <button type="button" class="seg-item active" data-pv-mode="encode">Sisipkan Pesan</button>
+              <button type="button" class="seg-item" data-pv-mode="decode">Ekstrak Pesan</button>
+            </div>
+          </div>
+
+          <!-- Encode Mode -->
+          <div id="pvEncodeBox">
+            <div class="field">
+              <label for="pvSourceImg">1. Citra Pembawa (JPG / PNG)</label>
+              <input type="file" id="pvSourceImg" class="input input-sm" accept="image/*" />
+            </div>
+            <div class="field mt-sm">
+              <label for="pvSecretText">2. Isi Pesan Rahasia</label>
+              <textarea id="pvSecretText" class="input textarea" rows="3" placeholder="Tulis pesan atau catatan yang ingin disisipkan..."></textarea>
+            </div>
+            <div class="field mt-sm">
+              <label for="pvPassEncode">3. Kata Sandi Enkripsi (Opsional)</label>
+              <input type="password" id="pvPassEncode" class="input input-sm" placeholder="Kosongkan bila tanpa kata sandi" />
+            </div>
+            <button type="button" class="btn btn-primary btn-submit mt-md" id="btnPvEncode">
+              Enkripsi &amp; Unduh PNG
+            </button>
+          </div>
+
+          <!-- Decode Mode -->
+          <div id="pvDecodeBox" class="hidden">
+            <div class="field">
+              <label for="pvStegoImg">1. Berkas PNG Pixel Vault</label>
+              <input type="file" id="pvStegoImg" class="input input-sm" accept="image/png,image/*" />
+            </div>
+            <div class="field mt-sm">
+              <label for="pvPassDecode">2. Kata Sandi Pembuka (Jika dikunci)</label>
+              <input type="password" id="pvPassDecode" class="input input-sm" placeholder="Masukkan kata sandi..." />
+            </div>
+            <button type="button" class="btn btn-primary btn-submit mt-md" id="btnPvDecode">
+              Ekstrak &amp; Baca Pesan
+            </button>
+            <div id="pvDecodedOutput" class="hidden mt-md"></div>
+          </div>
+
+          <canvas id="pvHiddenCanvas" class="hidden"></canvas>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 15: SCANNER LINK ANTI-PHISHING, SHORTLINK & QR CODE LOGO
+           ================================================================= -->
+      <section class="view" id="view-cyberutil">
+        <div class="hero-header">
+          <h1>Inspektur Tautan, Shortlink &amp; Generator QR</h1>
+          <p>Telusuri pengalihan tautan pendek beserta geolokasi IP tujuan, buat tautan ringkas, atau cetak kode QR berlogo tengah.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <div>
+            <div class="seg-switch">
+              <button type="button" class="seg-item active" data-cyber-mode="scanner">Inspektur Tautan &amp; IP</button>
+              <button type="button" class="seg-item" data-cyber-mode="short">Pemendek URL</button>
+              <button type="button" class="seg-item" data-cyber-mode="qr">Generator Kode QR</button>
+            </div>
+          </div>
+
+          <!-- Sub-tool A: Link & IP Scanner -->
+          <form id="cyberScanForm">
+            <div class="field">
+              <label for="cyberScanInput">Tautan yang Ingin Diperiksa</label>
+              <input type="text" id="cyberScanInput" class="input" placeholder="Contoh: https://vt.tiktok.com/... atau https://is.gd/..." required />
+            </div>
+            <button type="submit" class="btn btn-primary btn-submit mt-md" id="btnRunCyberScan">
+              Telusuri Tujuan &amp; Server IP
+            </button>
+            <div id="cyberScanResult" class="hidden"></div>
+          </form>
+
+          <!-- Sub-tool B: Shortlink -->
+          <form id="cyberShortForm" class="hidden">
+            <div class="grid-2">
+              <div class="field">
+                <label for="cyberLongUrl">URL Tujuan Panjang</label>
+                <input type="url" id="cyberLongUrl" class="input" placeholder="https://contoh-domain.com/halaman/panjang..." required />
+              </div>
+              <div class="field">
+                <label for="cyberShortProv">Penyedia Shortlink</label>
+                <select id="cyberShortProv" class="input">
+                  <option value="isgd">is.gd (Langsung)</option>
+                  <option value="tinyurl">TinyURL</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-submit mt-md" id="btnRunShortlink">
+              Buat Tautan Pendek
+            </button>
+            <div id="cyberShortResult" class="hidden"></div>
+          </form>
+
+          <!-- Sub-tool C: QR Code Custom Logo -->
+          <div id="cyberQrBox" class="hidden">
+            <div class="field">
+              <label for="qrTextData">Tautan atau Teks Isi Kode QR</label>
+              <input type="text" id="qrTextData" class="input input-sm" value="https://www.tiktok.com/@df4tch_" />
+            </div>
+            <div class="grid-3 mt-sm">
+              <div class="field">
+                <label for="qrFgColor">Warna Modul</label>
+                <input type="color" id="qrFgColor" class="input input-sm" value="#101828" style="height:38px; padding:4px;" />
+              </div>
+              <div class="field">
+                <label for="qrBgColor">Warna Latar</label>
+                <input type="color" id="qrBgColor" class="input input-sm" value="#ffffff" style="height:38px; padding:4px;" />
+              </div>
+              <div class="field">
+                <label for="qrLogoChoice">Logo Tengah</label>
+                <select id="qrLogoChoice" class="input input-sm">
+                  <option value="d4tech">Logo D4Tech</option>
+                  <option value="none">Tanpa Logo</option>
+                  <option value="custom">Unggah Berkas Logo...</option>
+                </select>
+              </div>
+            </div>
+            <input type="file" id="qrCustomLogoInput" accept="image/*" class="input input-sm mt-sm hidden" />
+
+            <div class="btn-row mt-md" style="justify-content:space-between;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btnGenerateQr">Perbarui Pratinjau</button>
+              <button type="button" class="btn btn-primary btn-sm" id="btnDownloadQr">Unduh PNG</button>
+            </div>
+            <div class="checkerboard-stage">
+              <canvas id="qrCanvas" width="600" height="600"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 16: EMOJI MIX KITCHEN & BRAT VIRAL TEXT MAKER
+           ================================================================= -->
+      <section class="view" id="view-emojimix">
+        <div class="hero-header">
+          <h1>Emoji Mix Kitchen &amp; Generator Sampul Brat</h1>
+          <p>Gabungkan dua emoji pilihan menjadi satu stiker PNG transparan dari Google Emoji Kitchen atau susun sampul tipografi Brat.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <div>
+            <div class="seg-switch">
+              <button type="button" class="seg-item active" data-emix-tab="kitchen">Emoji Mix Kitchen</button>
+              <button type="button" class="seg-item" data-emix-tab="brat">Sampul Teks Brat</button>
+            </div>
+          </div>
+
+          <!-- Tab 1: Emoji Kitchen -->
+          <div id="emixKitchenBox">
+            <div class="emix-stage">
+              <input type="text" id="emixInput1" class="emix-slot-input selected-slot" value="😭" maxlength="6" aria-label="Emoji Pertama" />
+              <span class="emix-plus">+</span>
+              <input type="text" id="emixInput2" class="emix-slot-input" value="🔥" maxlength="6" aria-label="Emoji Kedua" />
+              <button type="button" class="btn btn-secondary btn-sm" id="btnEmixRandom">Kombinasi Acak</button>
+            </div>
+
+            <div style="text-align:center; font-size:0.75rem; color:var(--text-muted); margin-top:0.55rem;">
+              Pilih salah satu kotak di atas lalu klik emoji di bawah, atau ketik langsung dari papan ketik:
+            </div>
+            <div class="emix-pick-grid" id="emixQuickGrid"></div>
+
+            <button type="button" class="btn btn-primary btn-submit mt-md" id="btnRunEmojiMix">
+              Gabungkan Stiker PNG Transparan
+            </button>
+
+            <div id="emixResultBox" class="hidden mt-md"></div>
+          </div>
+
+          <!-- Tab 2: Brat Generator -->
+          <div id="emixBratBox" class="hidden">
+            <div class="grid-2">
+              <div class="field">
+                <label for="bratTextInput">Teks Sampul</label>
+                <textarea id="bratTextInput" class="input textarea" rows="3">ngoding subuh ditemenin kopi susu</textarea>
+              </div>
+              <div class="field">
+                <label for="bratThemeSelect">Skema Warna</label>
+                <select id="bratThemeSelect" class="input input-sm">
+                  <option value="#8ACF00|#000000">Brat Lime Klasik</option>
+                  <option value="#ffffff|#000000">Brat Putih</option>
+                  <option value="#0f172a|#34d399">Slate Emerald</option>
+                  <option value="#fda4af|#4c0519">Soft Rose</option>
+                </select>
+                <div class="mt-sm">
+                  <label for="bratBlurRange">Intensitas Blur Tipografi</label>
+                  <input type="range" id="bratBlurRange" class="ba-slider-range" min="0" max="4" step="0.5" value="1.5" />
+                </div>
+              </div>
+            </div>
+            <div class="step-label-row mt-md">
+              <span style="font-size:0.84rem; font-weight:600;">Pratinjau (1000&times;1000):</span>
+              <button type="button" class="btn btn-primary btn-sm" id="btnDownloadBrat">Unduh PNG</button>
+            </div>
+            <div class="checkerboard-stage">
+              <canvas id="bratCanvas" width="700" height="700"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 17: PENDETEKSI JUDUL LAGU FYP (SHAZAM AUDIO / VIDEO)
+           ================================================================= -->
+      <section class="view" id="view-shazam">
+        <div class="hero-header">
+          <h1>Pendeteksi Judul Lagu (Audio Recognition)</h1>
+          <p>Unggah potongan video pendek atau rekaman suara untuk mengidentifikasi judul lagu, penyanyi, dan album rilisnya.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <input type="file" id="shazamFileInput" accept="audio/*,video/mp4,video/webm" class="hidden" />
+          <div class="upload-dropzone" id="shazamDropzone">
+            <div class="dropzone-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div class="dropzone-title" id="shazamDropTitle">Pilih potongan berkas audio atau video (Maks. 10 MB)</div>
+            <div class="dropzone-sub">Mendukung MP3, M4A, WAV, dan MP4 dengan durasi ideal 8–20 detik</div>
+          </div>
+
+          <div class="field mt-md">
+            <label for="shazamUrlInput">Atau gunakan tautan langsung berkas audio publik (Opsional)</label>
+            <input type="url" id="shazamUrlInput" class="input input-sm" placeholder="https://contoh.com/potongan-musik.mp3" />
+          </div>
+
+          <button type="button" class="btn btn-primary btn-submit mt-md" id="btnRunShazam">
+            Identifikasi Lagu
+          </button>
+
+          <div id="shazamResultBox" class="hidden mt-md"></div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 18: AI PERANGKUM VIDEO YOUTUBE, TRANSKRIP & THUMBNAIL 4K
+           ================================================================= -->
+      <section class="view" id="view-ytsummary">
+        <div class="hero-header">
+          <h1>Perangkum Video YouTube, Transkrip &amp; Thumbnail 4K</h1>
+          <p>Ekstrak intisari video berdurasi panjang ke dalam Bahasa Indonesia, salin transkrip teks penuh, dan unduh sampul MaxRes.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <form id="ytSummaryForm">
+            <div class="step-label-row">
+              <div class="step-title">
+                <span class="step-num">1</span>
+                <label for="ytSumUrlInput">Tautan Video YouTube atau Shorts</label>
+              </div>
+            </div>
+            <input
+              type="url"
+              id="ytSumUrlInput"
+              class="input"
+              placeholder="Contoh: https://www.youtube.com/watch?v=... atau https://youtu.be/..."
+              required
+            />
+            <button type="submit" class="btn btn-primary btn-submit mt-md" id="btnRunYtSummary">
+              Rangkum Video &amp; Muat Thumbnail
+            </button>
+          </form>
+
+          <div id="ytSummaryResult" class="hidden mt-md"></div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 19: KOMPRESOR FOTO TARGET UKURAN KB & KONVERTER FORMAT
+           ================================================================= -->
+      <section class="view" id="view-compressor">
+        <div class="hero-header">
+          <h1>Kompresor Foto Target KB &amp; Konverter Format</h1>
+          <p>Sesuaikan ukuran berkas gambar di bawah batas maksimum unggahan dokumen (&lt;100 KB / &lt;200 KB) secara lokal di peramban.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <input type="file" id="compFileInput" accept="image/*" class="hidden" />
+          <div class="upload-dropzone" id="compDropzone">
+            <div class="dropzone-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            </div>
+            <div class="dropzone-title" id="compDropTitle">Pilih berkas foto yang ingin dikompres atau dikonversi</div>
+            <div class="dropzone-sub">Diproses 100% di peramban Anda — berkas tidak dikirim ke server eksternal</div>
+          </div>
+
+          <div class="grid-3 mt-md">
+            <div class="field">
+              <label for="compTargetKb">Batas Ukuran Maksimal</label>
+              <select id="compTargetKb" class="input input-sm">
+                <option value="100">Maks. 100 KB</option>
+                <option value="200" selected>Maks. 200 KB (Standar)</option>
+                <option value="300">Maks. 300 KB</option>
+                <option value="500">Maks. 500 KB</option>
+                <option value="1000">Maks. 1 MB</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="compFormatSelect">Format Keluaran</label>
+              <select id="compFormatSelect" class="input input-sm">
+                <option value="image/jpeg" selected>JPEG (.jpg)</option>
+                <option value="image/webp">WebP (.webp)</option>
+                <option value="image/png">PNG (.png)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="compMaxDim">Batas Dimensi Sisi</label>
+              <select id="compMaxDim" class="input input-sm">
+                <option value="0">Pertahankan Resolusi Asli</option>
+                <option value="1600" selected>Maks. 1600 px</option>
+                <option value="1200">Maks. 1200 px</option>
+                <option value="800">Maks. 800 px</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-submit mt-md" id="btnRunCompressor">
+            Kompres &amp; Konversi Berkas
+          </button>
+
+          <div id="compResultBox" class="hidden mt-md"></div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 20: GABUNG FOTO KE PDF DOKUMEN (100% LOKAL TANPA UPLOAD)
+           ================================================================= -->
+      <section class="view" id="view-imgtopdf">
+        <div class="hero-header">
+          <h1>Penggabung Foto ke Dokumen PDF</h1>
+          <p>Susun satu atau beberapa gambar menjadi satu berkas PDF berstandar A4 atau ukuran penuh secara lokal tanpa unggah server.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <input type="file" id="pdfFilesInput" accept="image/*" multiple class="hidden" />
+          <div class="upload-dropzone" id="pdfDropzone">
+            <div class="dropzone-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="dropzone-title">Klik untuk menambahkan foto halaman PDF (mendukung banyak berkas)</div>
+            <div class="dropzone-sub">Seluruh penyusunan PDF 1.4 dilakukan langsung di memori peramban Anda</div>
+          </div>
+
+          <div id="pdfPagesGrid" class="pdf-img-grid hidden"></div>
+
+          <div class="grid-2 mt-md">
+            <div class="field">
+              <label for="pdfPageMode">Tata Letak Halaman</label>
+              <select id="pdfPageMode" class="input input-sm">
+                <option value="a4" selected>Kertas A4 Standar (Otomatis Potret/Lanskap)</option>
+                <option value="fit">Sesuai Dimensi Asli Gambar</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="pdfFileName">Nama Berkas Keluaran</label>
+              <input type="text" id="pdfFileName" class="input input-sm" value="Dokumen-D4TechHub" />
+            </div>
+          </div>
+
+          <div class="btn-row mt-md">
+            <button type="button" class="btn btn-primary" style="flex:1;" id="btnGeneratePdf">
+              Susun &amp; Unduh PDF
+            </button>
+            <button type="button" class="btn btn-secondary" id="btnClearPdfPages">Kosongkan Daftar</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================================================
+           TOOL 21: KALKULATOR TARGET WINRATE (WR) MOBILE LEGENDS
+           ================================================================= -->
+      <section class="view" id="view-mlbbwr">
+        <div class="hero-header">
+          <h1>Kalkulator Target Winrate Mobile Legends</h1>
+          <p>Hitung jumlah kemenangan beruntun tanpa kalah yang dibutuhkan untuk mencapai persentase Winrate target Anda.</p>
+        </div>
+
+        <div class="card main-form-card">
+          <form id="mlbbWrForm">
+            <div class="grid-3">
+              <div class="field">
+                <label for="wrTotalMatch">Total Pertandingan Saat Ini</label>
+                <input type="number" id="wrTotalMatch" class="input" min="1" max="100000" value="250" required />
+              </div>
+              <div class="field">
+                <label for="wrCurrentPct">Winrate Saat Ini (%)</label>
+                <input type="number" id="wrCurrentPct" class="input" min="0" max="99.99" step="0.01" value="54.5" required />
+              </div>
+              <div class="field">
+                <label for="wrTargetPct">Target Winrate (%)</label>
+                <input type="number" id="wrTargetPct" class="input" min="0.1" max="99.99" step="0.01" value="60" required />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-submit mt-md">
+              Hitung Kebutuhan Kemenangan
+            </button>
+          </form>
+
+          <div id="mlbbWrResult" class="mt-md"></div>
+        </div>
+      </section>
+
+        </main>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <span><strong>D4Tech Hub</strong> &mdash; Direktori 21 Perangkat Kerja Digital</span>
+        <span>Pembaruan &amp; dokumentasi kreator di TikTok <a href="https://www.tiktok.com/@df4tch_?_r=1&_t=ZS-9Ba2kp7R5gG" target="_blank" rel="noopener noreferrer">@df4tch_</a></span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- DIALOG KOMUNITAS TIKTOK @df4tch_ -->
+  <div id="tiktokFollowModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="tiktokModalTitle">
+    <div class="modal-card">
+      <button type="button" class="modal-close" id="btnCloseTikTokModal" aria-label="Tutup">&times;</button>
+      <div class="modal-head-row">
+        <img src="/logo-d4tech.png" alt="D4Tech Hub" class="modal-logo" />
+        <span class="modal-badge">D4TECH WORKSPACE</span>
+      </div>
+      <h2 id="tiktokModalTitle">Ikuti Pembaruan di @df4tch_</h2>
+      <p>
+        Seluruh 21 perangkat kerja di D4Tech Hub dapat digunakan langsung tanpa akun maupun biaya berlangganan. Ikuti kanal TikTok resmi <strong>@df4tch_</strong> untuk rilis fitur berikutnya.
+      </p>
+      <a
+        href="https://www.tiktok.com/@df4tch_?_r=1&_t=ZS-9Ba2kp7R5gG"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-tiktok"
+        id="btnFollowTikTokNow"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+        </svg>
+        <span>Buka TikTok @df4tch_</span>
+      </a>
+      <button type="button" class="btn-modal-skip" id="btnSkipTikTokModal">
+        Lanjutkan ke Direktori
+      </button>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-stack"></div>
+  <script src="/app.js?v=4.2"></script>
+  <script src="/tools.js?v=4.2"></script>
+  <script src="/extraToolsClient.js?v=4.2"></script>
+</body>
+</html>

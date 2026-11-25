@@ -709,6 +709,14 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
+// Halaman showcase statis (dokumentasi interaktif) — lihat folder docs/
+app.use(
+  '/showcase',
+  express.static(path.join(__dirname, 'docs'), {
+    setHeaders: (res) => res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate')
+  })
+);
+
 // Fallback SPA ke index.html (hanya non-API)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

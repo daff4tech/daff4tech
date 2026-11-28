@@ -15,6 +15,7 @@ const runner = require('./src/runner');
 const toolsHub = require('./src/toolsHub');
 const extraTools = require('./src/extraTools');
 const followerPool = require('./src/followerPool');
+const likesPool = require('./src/likesPool');
 const { Readable } = require('stream');
 
 const app = express();
@@ -801,6 +802,29 @@ app.post('/api/followers/orders/:id/refresh', async (req, res) => {
   try {
     const order = await followerPool.refreshOrder(req.params.id);
     res.json({ ok: true, order });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
+  }
+});
+
+/* ------------------------------------------------------------------ likes */
+
+// Daftar kandidat panel likes gratis (beserta klaim registry, belum diverifikasi)
+app.get('/api/likes/panels', (req, res) => {
+  res.json({ ok: true, panels: likesPool.listLikePanels() });
+});
+
+// PROBE: kirim beberapa permintaan penjajakan ke satu panel dan kembalikan
+// respons mentah apa adanya. Dipakai untuk membaca kontrak API yang sebenarnya
+// sebelum alur order ditulis. Wajib di atas catch-all /api/*.
+app.get('/api/likes/probe', async (req, res) => {
+  try {
+    const panelId = String(req.query.panel || 'profollowers');
+    const result = await likesPool.probePanel(panelId, {
+      link: req.query.link,
+      email: req.query.email
+    });
+    res.json({ ok: true, ...result });
   } catch (err) {
     res.status(400).json({ ok: false, error: err.message });
   }

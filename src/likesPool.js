@@ -38,6 +38,24 @@ const LIKE_PANELS = {
     transport: 'http',
     yieldLikes: 50,
     note: 'Registry: 50 likes via API, TAPI menolak IP datacenter ("VPN / Proxy usage detected").'
+  },
+  // Dibaca langsung dari JS nicesmmpanel.com/free-instagram-likes:
+  //   fetch("https://test.socialfruit.co/api/gateway", { method:"POST",
+  //     headers:{ "Content-Type":"application/json", Accept:"application/json",
+  //               "X-Panel-Referer": location.href, "X-Panel-Origin": location.origin },
+  //     body: JSON.stringify({ link, quantity, provider_service_id, username }) })
+  // username default "guest" (hidden input), jadi tanpa email/pendaftaran.
+  socialfruit: {
+    id: 'socialfruit',
+    name: 'SocialFruit Gateway (dipakai NiceSMMPanel)',
+    apiUrl: 'https://test.socialfruit.co/api/gateway',
+    transport: 'http',
+    yieldLikes: 50,
+    referer: 'https://nicesmmpanel.com/free-instagram-likes',
+    origin: 'https://nicesmmpanel.com',
+    note:
+      'Backend bersama di balik halaman gratis nicesmmpanel. Body: ' +
+      '{link, quantity, provider_service_id, username}. Butuh X-Panel-Referer & X-Panel-Origin.'
   }
 };
 

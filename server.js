@@ -832,7 +832,7 @@ app.get('/api/likes/probe', async (req, res) => {
 
 // Host yang boleh dijangkau alat diagnostik. Ini BUKAN proxy umum: daftar
 // putih sengaja sempit supaya endpoint tidak bisa dipakai menembak situs lain.
-const LIKES_PROBE_HOSTS = ['profollowers.uk', 'nicesmmpanel.com'];
+const LIKES_PROBE_HOSTS = ['profollowers.uk', 'nicesmmpanel.com', 'test.socialfruit.co'];
 
 function assertProbeHost(rawUrl) {
   let parsed;
@@ -896,17 +896,27 @@ app.get('/api/likes/try', async (req, res) => {
     target = new URL(panel.apiUrl).origin + override;
   }
 
+  // Gateway socialfruit menandai panel pemanggil lewat dua header ini. Default
+  // diambil dari definisi panel; boleh ditimpa agar pengaruhnya bisa diuji.
+  const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+  const referer = String(req.query.referer ?? panel.referer ?? '');
+  const origin = String(req.query.origin ?? panel.origin ?? '');
+  if (referer) headers['X-Panel-Referer'] = referer;
+  if (origin) headers['X-Panel-Origin'] = origin;
+
   const result = await likesPool.rawRequest(
     target,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      previewChars: 1500
-    },
+    { method: 'POST', headers, body: JSON.stringify(payload), previewChars: 1500 },
     15000
   );
-  res.json({ ok: true, panelId, sent: payload, pathOverride: override || null, ...result });
+  res.json({
+    ok: true,
+    panelId,
+    sent: payload,
+    panelHeaders: { referer: referer || null, origin: origin || null },
+    pathOverride: override || null,
+    ...result
+  });
 });
 
 // Ambil halaman panel lalu HANYA kembalikan potongan yang cocok regex.

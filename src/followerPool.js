@@ -167,9 +167,10 @@ const DEFAULT_CONFIG = {
 };
 
 // Kata kunci pencocokan layanan panel SMM. Banyak panel (mis. Followdeh)
-// mencantumkan katalog berbahasa Persia, jadi ejaan Persia disertakan agar
-// paket "ممبر کانال واتساپ" tetap dikenali alih-alih gagal "layanan tak ada".
-const SVC_WHATSAPP = /whatsapp|واتساپ|واتس‌اپ|wa\b/i;
+// mencantumkan katalog berbahasa Persia. Ejaan "واتساپ" di alam liar ternyata
+// beragam — "واتس آپ", "واتس اپ", "واتساپ", "واتس‌اپ" — jadi yang dicocokkan
+// adalah akarnya ("واتس"), bukan satu ejaan utuh.
+const SVC_WHATSAPP = /whatsapp|واتس|wa\b/i;
 const SVC_MEMBER = /follower|member|pengikut|subscriber|ممبر|عضو|فالوور|دنبال/i;
 
 const FREE_CHANNELS = [
@@ -642,7 +643,9 @@ function scoreService(service, channel) {
   let score = 0;
   if (/channel|کانال/.test(haystack)) score += 3;
   if (/follower|pengikut|subscriber|member|ممبر|عضو|فالوور/.test(haystack)) score += 2;
-  if (/reaction|react|poll|view|ویو|grup|group|chat/.test(haystack)) score -= 3;
+  if (/reaction|react|poll|view|ویو|grup|group|chat|گروه|اکشن|نظرسنجی|پیام|دایرکت/.test(haystack)) {
+    score -= 3;
+  }
   if (service.type && /default|package/i.test(service.type)) score += 1;
   return score;
 }
@@ -1022,6 +1025,7 @@ async function placeFollowerOrder({
     quantity: success.quantityUsed || qty,
     mode: success.mode,
     externalOrderId: success.externalOrderId,
+    serviceId: success.serviceId || null,
     serviceName: success.serviceName || null,
     status: success.mode === 'smm' ? 'processing' : 'accepted',
     verified: delta !== null && delta > 0,

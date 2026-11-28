@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img" aria-label="D4Tech Hub — Super-App 21 perangkat kreator, AI dan siber">
-  <title>D4Tech Hub — Super-App 21 perangkat kreator, AI &amp; siber</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img" aria-label="D4Tech Hub — Super-App 22 perangkat kreator, AI dan siber">
+  <title>D4Tech Hub — Super-App 22 perangkat kreator, AI &amp; siber</title>
   <defs>
     <linearGradient id="spBg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#0c1016"/>
@@ -88,7 +88,7 @@
   <!-- wordmark -->
   <g font-family="Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" text-anchor="middle">
     <text x="640" y="404" font-size="82" font-weight="800" letter-spacing="-3" fill="url(#spWord)">D4Tech Hub</text>
-    <text x="640" y="452" font-size="22" fill="#aeb8c6">21 perangkat kreator, AI &amp; siber — satu hub tanpa registrasi.</text>
+    <text x="640" y="452" font-size="22" fill="#aeb8c6">22 perangkat kreator, AI &amp; siber — satu hub tanpa registrasi.</text>
   </g>
 
   <!-- pills -->

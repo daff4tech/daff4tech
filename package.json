@@ -1,7 +1,7 @@
 {
   "name": "d4tech-hub",
-  "version": "4.2.1",
-  "description": "D4Tech Hub v4.2.1 — Super-App 21 Tools Kreator, AI & Siber Gratis (PWA + Deep-Link + Multi-GPU)",
+  "version": "4.3.0",
+  "description": "D4Tech Hub v4.3.0 — Super-App 22 Tools Kreator, AI & Siber Gratis (PWA + Deep-Link + Multi-GPU + Penambah Followers Saluran WA)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

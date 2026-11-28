@@ -175,7 +175,17 @@ function createDefaultDb() {
       }
     ],
     campaigns: [],
-    logs: []
+    logs: [],
+    // Modul Penambah Followers Saluran WhatsApp (lihat src/followerPool.js)
+    followerOrders: [],
+    followerConfig: {
+      waha: { baseUrl: '', session: 'default', apiKey: '', pairingPhone: '' },
+      smm: {
+        followdeh: { apiKey: '' },
+        smmIst: { apiKey: '' },
+        custom: { apiUrl: '', apiKey: '', apiId: '', secretKey: '' }
+      }
+    }
   };
 }
 

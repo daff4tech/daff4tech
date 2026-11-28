@@ -1,16 +1,16 @@
 <div align="center">
 
-<img src="assets/banner.svg" alt="D4Tech Hub — 21 perangkat kreator, AI & siber dalam satu hub" width="100%" />
+<img src="assets/banner.svg" alt="D4Tech Hub — 22 perangkat kreator, AI & siber dalam satu hub" width="100%" />
 
 <br />
 
-**Super-App PWA berisi 21 perangkat kreator, AI, audio, dokumen, dan siber.**
+**Super-App PWA berisi 22 perangkat kreator, AI, audio, dokumen, dan siber.**
 Satu proses Node.js. Tanpa registrasi. Tanpa langganan.
 
 [![Node.js](https://img.shields.io/badge/Node.js-%E2%89%A518-3c873a?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![Express](https://img.shields.io/badge/Express-4.x-0b0e13?style=flat-square&logo=express&logoColor=white)](https://expressjs.com)
 [![PWA](https://img.shields.io/badge/PWA-installable-12b76a?style=flat-square&logo=pwa&logoColor=white)](#-pwa-installable)
-[![Modul](https://img.shields.io/badge/modul-21-12b76a?style=flat-square)](#-21-modul)
+[![Modul](https://img.shields.io/badge/modul-22-12b76a?style=flat-square)](#-22-modul)
 [![Registrasi](https://img.shields.io/badge/registrasi-0-ce3f55?style=flat-square)](#)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel%20%C2%B7%20Render%20%C2%B7%20Docker-6b7280?style=flat-square)](#-deploy)
 
@@ -31,7 +31,7 @@ Satu proses Node.js. Tanpa registrasi. Tanpa langganan.
   <tr>
     <td width="50%">
       <img src="assets/screenshots/app-home-light.png" alt="Direktori D4Tech Hub tema terang" />
-      <br /><sub><b>Tema terang</b> — direktori 21 modul</sub>
+      <br /><sub><b>Tema terang</b> — direktori 22 modul</sub>
     </td>
     <td width="50%">
       <img src="assets/screenshots/app-home-dark.png" alt="Direktori D4Tech Hub tema gelap" />
@@ -54,7 +54,8 @@ Satu proses Node.js. Tanpa registrasi. Tanpa langganan.
 
 - [Tampilan](#-tampilan)
 - [Kenapa D4Tech Hub](#-kenapa-d4tech-hub)
-- [21 Modul](#-21-modul)
+- [Penambah Followers Saluran WhatsApp](#-penambah-followers-saluran-whatsapp)
+- [22 Modul](#-22-modul)
 - [Coba di browser](#-coba-di-browser)
 - [Quick start](#-quick-start)
 - [Deploy](#-deploy)
@@ -77,7 +78,7 @@ Satu proses Node.js. Tanpa registrasi. Tanpa langganan.
 
 ---
 
-## 🧰 21 Modul
+## 🧰 22 Modul
 
 <details open>
 <summary><b>🔥 Sosmed &amp; Musik</b> — 5 modul</summary>
@@ -85,6 +86,7 @@ Satu proses Node.js. Tanpa registrasi. Tanpa langganan.
 | # | Modul | Fungsi |
 | :-: | --- | --- |
 | 1 | **Reaction Saluran WhatsApp** | Kirim multi-emoji reaction ke postingan Saluran WA lewat pool gateway publik. |
+| 1b | **Penambah Followers Saluran WhatsApp** | Naikkan pengikut saluran lewat WAHA open-source, panel SMM ber-kredit gratis, dan bukti kenaikan yang dibaca langsung dari WhatsApp. <br /><sub>[Panduan teknis & hasil riset API](docs/followers.md)</sub> |
 | 2 | **YouTube ke MP3** | Konversi tautan atau pencarian lagu ke MP3 64–320 kbps. |
 | 3 | **Downloader TikTok & Sosmed HD** | Video tanpa watermark, slide foto, MP3, dan Reels. |
 | 4 | **Pendeteksi Judul Lagu FYP** | Audio fingerprint untuk melacak judul, artis, dan album. |
@@ -131,6 +133,37 @@ Satu proses Node.js. Tanpa registrasi. Tanpa langganan.
 | 21 | **Inspektur Tautan, Shortlink & QR** | Bongkar redirect mencurigakan + GeoIP, ringkas URL, QR berlogo. |
 
 </details>
+
+---
+
+## ➕ Penambah Followers Saluran WhatsApp
+
+Modul ini melanjutkan *Reaction Saluran WhatsApp* ke penambahan **pengikut** saluran.
+Tidak ada angka palsu: setiap jalur menekan tombol **Ikuti** dari akun WhatsApp asli,
+lalu jumlah pengikut publik dibaca ulang sebagai bukti.
+
+| Jalur | Biaya | Cara | Catatan |
+| --- | --- | --- | --- |
+| **WAHA** (open source) | Rp 0, tanpa limit | `POST /api/{session}/channels/{invite}/follow` | Jalankan sekali via Docker, tautkan nomor lewat QR/pairing code **langsung dari halaman modul** |
+| **Followdeh** | Kredit gratis (1/30 menit) | `POST https://www.followdeh.com/api/v1` | Paket *Free WhatsApp Channel Members* |
+| **SMM.ist** | Free trial members | `POST https://smm.ist/api/v2` | API v2 standar |
+| **Panel kustom** | Sesuai panel | `key/action/service/link/quantity` | Layanan WA Channel Followers dipilih otomatis |
+| **Quantaps** | Rp 0 | Form manual 1–25 followers | Tanpa API publik |
+
+Bukti kenaikan (`sebelum → sesudah → delta`) disimpan di riwayat, dan tombol
+**Cek ulang** membaca ulang angka publik serta status order panel.
+
+```bash
+# contoh: jalankan order lewat mode otomatis (failover)
+curl -X POST http://localhost:3000/api/followers/order \
+  -H 'Content-Type: application/json' \
+  -d '{"link":"https://whatsapp.com/channel/0029Va…","quantity":20,"channelId":"auto"}'
+```
+
+> WhatsApp tidak menyediakan API resmi Channels dan follow massal dari satu nomor
+> berisiko dibatasi. Gunakan jumlah wajar (10–50), beri jeda, dan jangan mengklaim
+> hasil sebelum angka publik benar-benar naik.
+> Detail lengkap: **[docs/followers.md](docs/followers.md)**.
 
 ---
 

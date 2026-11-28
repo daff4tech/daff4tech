@@ -26,6 +26,7 @@
   /* ------------------------------------------------------------------ data */
   const ICONS = {
     send: '<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>',
+    followers: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/>',
     ytmp3: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
     downloader: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
     tts: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/>',
@@ -50,6 +51,7 @@
 
   const TOOLS = [
     { slug: 'send', cat: 'sosmed', title: 'Reaction Saluran WhatsApp', tag: 'Multi-Gateway', desc: 'Kirim kombinasi multi-emoji ke tautan postingan Saluran WhatsApp secara otomatis melalui jaringan pool publik.' },
+    { slug: 'followers', cat: 'sosmed', title: 'Penambah Followers Saluran WhatsApp', tag: 'API Gratis', desc: 'Naikkan pengikut Saluran lewat WAHA open-source + panel SMM ber-kredit gratis, dengan bukti kenaikan yang dibaca langsung dari WhatsApp.' },
     { slug: 'ytmp3', cat: 'sosmed', title: 'YouTube ke MP3 Multi-Kualitas', tag: '64–320 kbps', desc: 'Ekstrak audio dari tautan YouTube atau pencarian judul lagu dengan pilihan bitrate hingga 320 kbps Hi-Fi.' },
     { slug: 'tts', cat: 'kreator', title: 'Studio Narator Dracin & AI TTS', tag: 'Dracin + BGM', desc: 'Sintesis suara narator alur cerita film lengkap dengan musik latar dramatis, suara natural Gemini, dan 7 bahasa.' },
     { slug: 'downloader', cat: 'sosmed', title: 'Downloader TikTok & Sosmed HD', tag: 'Tanpa WM', desc: 'Unduh video TikTok resolusi asli tanpa tanda air, koleksi slide foto, trek MP3, serta Reels sosial media.' },

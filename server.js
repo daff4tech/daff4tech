@@ -14,6 +14,7 @@ const {
 const runner = require('./src/runner');
 const toolsHub = require('./src/toolsHub');
 const extraTools = require('./src/extraTools');
+const followerPool = require('./src/followerPool');
 const { Readable } = require('stream');
 
 const app = express();
@@ -63,7 +64,9 @@ app.get('/api/state', (req, res) => {
     sandboxBalance: store.data.sandboxBalance,
     providers: store.getProviders(),
     campaigns: store.getCampaigns(),
-    logs: store.data.logs.slice(0, 120)
+    logs: store.data.logs.slice(0, 120),
+    followerConfig: followerPool.getPublicConfig(),
+    followerChannels: followerPool.getChannelCatalog()
   });
 });
 
@@ -680,6 +683,107 @@ app.post('/api/tools/yt-summary', async (req, res) => {
       url: req.body?.url
     });
     res.json({ ok: true, result });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
+  }
+});
+
+// ===========================================================================
+// MODUL BARU: PENAMBAH FOLLOWERS SALURAN WHATSAPP (jalur gratis nyata)
+// ===========================================================================
+
+// Daftar jalur gratis + status konfigurasi (tanpa membocorkan API key)
+app.get('/api/followers/channels', (req, res) => {
+  try {
+    res.json({ ok: true, channels: followerPool.getChannelCatalog() });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Simpan konfigurasi WAHA mandiri / API key panel SMM
+app.post('/api/followers/config', (req, res) => {
+  try {
+    const channels = followerPool.updateConfig(req.body || {});
+    res.json({ ok: true, channels });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
+  }
+});
+
+// Health-check semua jalur (paralel, tanpa memotong kuota)
+app.get('/api/followers/health', async (req, res) => {
+  try {
+    const health = await followerPool.checkChannelsHealth({
+      force: req.query.force === '1'
+    });
+    res.json({ ok: true, ...health });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Validasi tautan saluran + baca nama & jumlah pengikut publik
+app.post('/api/followers/inspect', async (req, res) => {
+  try {
+    const parsed = followerPool.parseChannelLink(req.body?.link);
+    const probe = await followerPool.probePublicChannel(parsed.channelCode, {
+      timeoutMs: 10000,
+      force: req.body?.force === true
+    });
+    res.json({ ok: true, parsed, channel: probe });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
+  }
+});
+
+// Penautan nomor WhatsApp ke instance WAHA mandiri (QR / status sesi)
+app.get('/api/followers/waha/status', async (req, res) => {
+  try {
+    res.json({ ok: true, ...(await followerPool.getWahaStatus()) });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
+  }
+});
+
+app.post('/api/followers/waha/connect', async (req, res) => {
+  try {
+    res.json({ ok: true, ...(await followerPool.ensureWahaSession()) });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
+  }
+});
+
+// Riwayat order penambahan followers
+app.get('/api/followers/orders', (req, res) => {
+  res.json({ ok: true, orders: followerPool.getOrders() });
+});
+
+app.delete('/api/followers/orders', (req, res) => {
+  followerPool.clearOrders();
+  res.json({ ok: true, orders: [] });
+});
+
+// Jalankan penambahan followers (auto-failover lintas jalur gratis)
+app.post('/api/followers/order', async (req, res) => {
+  try {
+    const result = await followerPool.placeFollowerOrder({
+      channelLink: req.body?.link,
+      quantity: req.body?.quantity,
+      channelId: req.body?.channelId || 'auto',
+      note: req.body?.note
+    });
+    res.json({ ok: true, ...result });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
+  }
+});
+
+// Cek ulang bukti kenaikan pengikut + status panel
+app.post('/api/followers/orders/:id/refresh', async (req, res) => {
+  try {
+    const order = await followerPool.refreshOrder(req.params.id);
+    res.json({ ok: true, order });
   } catch (err) {
     res.status(400).json({ ok: false, error: err.message });
   }

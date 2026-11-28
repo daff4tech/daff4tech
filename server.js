@@ -839,7 +839,11 @@ const LIKES_PROBE_HOSTS = [
   // smm8: 100 likes IG gratis per 30 menit, tanpa email/pendaftaran.
   // Registry menandainya profil "self" karena ordernya baru dibuat saat timer
   // habis - bukan karena IP ditolak - jadi layak diuji dari datacenter.
-  'smm8.com'
+  'smm8.com',
+  // Mesin sebenarnya di balik widget gratis smm8:
+  //   <script defer src="https://telegramadviser.com/api/ravin.js?ver=20">
+  //   <div id="free" data-code="instalikes">
+  'telegramadviser.com'
 ];
 
 function assertProbeHost(rawUrl) {

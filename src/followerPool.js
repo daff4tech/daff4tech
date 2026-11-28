@@ -9,7 +9,9 @@
  *  1. WAHA Community (open source, 100% gratis) — `POST /api/{session}/channels/{invite}/follow`
  *     Dipakai sebagai relay follow sungguhan. Bisa memakai node publik WAHA
  *     atau instance mandiri di VPS sendiri (tanpa limit, tanpa biaya).
- *  2. Followdeh API v1 — SMM panel dengan kredit gratis (1 kredit / 30 menit,
+ *  2. Followdeh API v1 — SMM panel berbayar untuk WhatsApp (kredit gratisnya
+ *     hanya untuk platform lain, TIDAK mencakup WhatsApp — diverifikasi di
+ *     followdeh.com/en/free: daftar platform gratis tidak memuat WhatsApp).
  *     maks 30/bulan) yang bisa dipakai untuk paket "WhatsApp Channel Members".
  *     Endpoint: https://www.followdeh.com/api/v1 (key, action=services|add|status|balance)
  *  3. SMM.ist API v2 — panel dengan free trial WhatsApp Channel Members.
@@ -196,15 +198,15 @@ const FREE_CHANNELS = [
     type: 'smm_v2',
     apiUrl: 'https://www.followdeh.com/api/v1',
     statusAction: 'status',
-    name: 'Followdeh — Kredit Gratis',
-    tagline: 'API resmi · kredit gratis tiap 30 menit',
+    name: 'Followdeh — Panel Berbayar',
+    tagline: 'API resmi · butuh saldo (kredit gratis tidak mencakup WhatsApp)',
     free: true,
     keyless: false,
     requiresConfig: true,
     signupUrl: 'https://www.followdeh.com/auth/signup',
     docsUrl: 'https://www.followdeh.com/en/api/docs',
     bestFor:
-      'Paket "Free WhatsApp Channel Members" (10–100 followers) dari kredit gratis. Butuh API key gratis dari dashboard.',
+      'Layanan ممبر کانال واتس اپ (min 10–100) lewat API resmi. PENTING: kredit gratis Followdeh hanya untuk platform lain — WhatsApp harus pakai saldo. Butuh API key dari dashboard.',
     serviceFilter: SVC_WHATSAPP,
     serviceKind: SVC_MEMBER
   },
@@ -749,7 +751,22 @@ async function followViaSmm(channel, apiKey, parsed, quantity, extra = {}) {
     );
   }
   if (json.error) {
-    throw new Error(`Panel menolak order: ${json.error}`);
+    const msg = String(json.error);
+    // Saldo kurang: sebutkan angkanya, jangan hanya meneruskan pesan panel.
+    if (/not enough funds|insufficient|balance|saldo/i.test(msg)) {
+      const cost =
+        best.rate && best.rate > 0 ? (best.rate * qty) / 1000 : null;
+      const saldo = balance ? `${balance.amount} ${balance.currency}`.trim() : 'tidak terbaca';
+      throw new Error(
+        `Saldo panel tidak cukup untuk order ini.\n` +
+          `Saldo saat ini: ${saldo}\n` +
+          `Perkiraan biaya: ${cost !== null ? `${Math.ceil(cost)} ${balance?.currency || ''}`.trim() : 'tidak dapat dihitung'} ` +
+          `(${qty} × layanan "${best.name}", tarif ${best.rate} per 1.000)\n\n` +
+          `Isi saldo di dashboard panel, atau pakai jalur lain yang tidak memerlukan saldo ` +
+          `(WAHA mandiri — gratis tanpa limit).`
+      );
+    }
+    throw new Error(`Panel menolak order: ${msg}`);
   }
 
   const orderId = json.order ?? json.order_id ?? json.id ?? json.data?.order ?? null;
@@ -865,7 +882,7 @@ function describeMissingPaths(rt) {
   }
   if (!rt.followdehKey) {
     items.push(
-      'Followdeh (kredit gratis tiap 30 menit): daftar gratis di https://www.followdeh.com/auth/signup lalu tempel API key-nya.'
+      'Followdeh (butuh SALDO — kredit gratisnya tidak mencakup WhatsApp): daftar di https://www.followdeh.com/auth/signup, isi saldo, lalu tempel API key-nya.'
     );
   }
   if (!rt.smmIstKey) {
@@ -1395,6 +1412,17 @@ async function listPanelServices(channelId) {
   if (!apiUrl) throw new Error('URL API panel belum diatur.');
   if (!apiKey) throw new Error('API key panel belum diisi.');
 
+  // Baca saldo lebih dulu agar pengguna tahu apakah order memang mampu dibayar.
+  let balance = null;
+  try {
+    const balRes = await smmPost(apiUrl, { key: apiKey, action: 'balance', ...smmExtraFor(channelId, rt) }, 14000);
+    if (balRes.json && balRes.json.balance !== undefined) {
+      balance = { amount: balRes.json.balance, currency: balRes.json.currency || '' };
+    }
+  } catch {
+    /* panel mungkin tidak punya action balance */
+  }
+
   const services = await smmFetchServices(apiUrl, apiKey, smmExtraFor(channelId, rt), 20000);
   const withScore = services
     .map((s) => ({ ...s, score: scoreService(s, { ...def, apiUrl }) }))
@@ -1419,6 +1447,7 @@ async function listPanelServices(channelId) {
     channelId,
     channelName: def.name,
     apiUrl,
+    balance,
     totalServices: services.length,
     matchedServices: withScore.filter((s) => s.score >= 0).length,
     whatsappRelated: waRelated.map(brief),

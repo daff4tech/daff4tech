@@ -723,6 +723,18 @@ app.get('/api/followers/health', async (req, res) => {
   }
 });
 
+// Diagnostik katalog layanan panel — dipakai bila panel online tetapi tidak ada
+// layanan yang dikenali, agar nama layanan aslinya terlihat.
+app.get('/api/followers/services', async (req, res) => {
+  try {
+    const channelId = String(req.query.channel || 'followdeh');
+    const result = await followerPool.listPanelServices(channelId);
+    res.json({ ok: true, ...result });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
+  }
+});
+
 // Validasi tautan saluran + baca nama & jumlah pengikut publik
 app.post('/api/followers/inspect', async (req, res) => {
   try {

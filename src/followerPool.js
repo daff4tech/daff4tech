@@ -1367,6 +1367,58 @@ async function getWahaStatus() {
   return { configured: true, baseUrl: target.baseUrl, session: target.session, ...info };
 }
 
+/* ------------------------------------------------------------- diagnostik  */
+
+/**
+ * Menampilkan katalog layanan sebuah panel apa adanya, lengkap dengan skor
+ * pencocok otomatis. Dipakai ketika panel online tetapi tidak ada layanan yang
+ * dikenali — supaya nama layanan asli terlihat dan pencocokan bisa disesuaikan,
+ * bukan ditebak.
+ */
+async function listPanelServices(channelId) {
+  const rt = runtimeConfig();
+  const def = publicChannelById(channelId);
+  if (!def) throw new Error(`Jalur "${channelId}" tidak dikenali.`);
+  if (def.type !== 'smm_v2') {
+    throw new Error(`Jalur "${channelId}" bukan panel SMM, tidak punya katalog layanan.`);
+  }
+
+  const apiUrl = def.id === 'smm_custom' ? rt.customSmm.apiUrl : def.apiUrl;
+  const apiKey = getApiKeyForChannel(channelId, rt);
+  if (!apiUrl) throw new Error('URL API panel belum diatur.');
+  if (!apiKey) throw new Error('API key panel belum diisi.');
+
+  const services = await smmFetchServices(apiUrl, apiKey, smmExtraFor(channelId, rt), 20000);
+  const withScore = services
+    .map((s) => ({ ...s, score: scoreService(s, { ...def, apiUrl }) }))
+    .sort((a, b) => b.score - a.score || a.rate - b.rate);
+
+  const brief = (s) => ({
+    service: s.id,
+    name: s.name,
+    category: s.category,
+    rate: s.rate,
+    min: s.min,
+    max: s.max,
+    score: s.score
+  });
+
+  // Layanan apa pun yang menyinggung WhatsApp, terlepas dari cocok atau tidak.
+  const waRelated = withScore.filter((s) =>
+    /whatsapp|واتساپ|واتس|\bwa\b/i.test(`${s.name} ${s.category}`)
+  );
+
+  return {
+    channelId,
+    channelName: def.name,
+    apiUrl,
+    totalServices: services.length,
+    matchedServices: withScore.filter((s) => s.score >= 0).length,
+    whatsappRelated: waRelated.map(brief),
+    top: withScore.slice(0, 30).map(brief)
+  };
+}
+
 module.exports = {
   ensureWahaSession,
   getWahaStatus,
@@ -1382,6 +1434,7 @@ module.exports = {
   getChannelCatalog,
   updateConfig,
   checkChannelsHealth,
+  listPanelServices,
   runtimeConfig,
   maskKey
 };

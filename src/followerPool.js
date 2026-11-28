@@ -1164,7 +1164,10 @@ async function checkChannelsHealth({ force = false } = {}) {
       const scored = services
         .map((s) => ({ s, score: scoreService(s, { ...publicChannelById(channelId), apiUrl }) }))
         .filter((x) => x.score >= 0)
-        .sort((a, b) => b.score - a.score);
+        // Urutan harus sama dengan smmPickService (skor lalu harga), supaya
+        // label "termurah" di sini sama dengan layanan yang benar-benar dipilih
+        // saat order dijalankan.
+        .sort((a, b) => b.score - a.score || a.s.rate - b.s.rate);
 
       const best = scored[0]?.s;
       return {

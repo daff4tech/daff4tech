@@ -12,11 +12,32 @@
       api: async (u, o) => (await fetch(u, o)).json()
     };
 
+  // Label & placeholder per platform. Disamakan dengan PLATFORMS di server.
+  const PLATFORM_HINT = {
+    whatsapp: {
+      label: 'Saluran WhatsApp',
+      placeholder: 'https://whatsapp.com/channel/0029VaXXXXXXXXXXXX',
+      helper:
+        'Buka Saluran &rarr; menu <strong>Bagikan</strong> &rarr; <strong>Salin tautan</strong>. Saluran harus publik.'
+    },
+    instagram: {
+      label: 'Profil Instagram',
+      placeholder: 'https://instagram.com/namapengguna',
+      helper: 'Tempel tautan profil atau username polos. Profil harus <strong>publik</strong>.'
+    },
+    tiktok: {
+      label: 'Profil TikTok',
+      placeholder: 'https://tiktok.com/@namapengguna',
+      helper: 'Tempel tautan profil atau @username. Profil harus <strong>publik</strong>.'
+    }
+  };
+
   const state = {
     channels: [],
     health: null,
     orders: [],
     quantity: 20,
+    platform: 'whatsapp',
     lastOrder: null,
     inspected: null,
     initialized: false
@@ -367,7 +388,7 @@
     const input = document.getElementById('followerChannelInput');
     const link = input?.value.trim();
     if (!link) {
-      toast?.('Tempel tautan Saluran WhatsApp terlebih dahulu.', 'error');
+      toast?.(`Tempel tautan ${PLATFORM_HINT[state.platform]?.label || 'target'} terlebih dahulu.`, 'error');
       return;
     }
 
@@ -387,7 +408,12 @@
     try {
       const data = await api('/api/followers/order', {
         method: 'POST',
-        body: JSON.stringify({ link, quantity: state.quantity, channelId })
+        body: JSON.stringify({
+          link,
+          platform: state.platform,
+          quantity: state.quantity,
+          channelId
+        })
       });
       state.lastOrder = data.order;
       renderResult();
@@ -532,6 +558,34 @@
     }
   }
 
+  /* ------------------------------------------------------------- platform */
+
+  function applyPlatform() {
+    const hint = PLATFORM_HINT[state.platform] || PLATFORM_HINT.whatsapp;
+    const input = document.getElementById('followerChannelInput');
+    const label = document.getElementById('followerLinkLabel');
+    if (input) input.placeholder = hint.placeholder;
+    if (label) label.textContent = `Tautan ${hint.label}`;
+    const helper = input?.closest('.step-section')?.querySelector('.helper-line span');
+    if (helper) helper.innerHTML = hint.helper;
+    document.querySelectorAll('[data-fol-platform]').forEach((chip) => {
+      chip.classList.toggle('is-active', chip.dataset.folPlatform === state.platform);
+    });
+    // "Cek Saluran" membaca og:title Saluran WhatsApp; tidak berlaku di IG/TikTok.
+    const inspect = document.getElementById('btnInspectChannel');
+    if (inspect) {
+      const wa = state.platform === 'whatsapp';
+      inspect.hidden = !wa;
+      if (!wa) {
+        const preview = document.getElementById('followerChannelPreview');
+        if (preview) {
+          preview.classList.add('hidden');
+          preview.innerHTML = '';
+        }
+      }
+    }
+  }
+
   /* ----------------------------------------------------------------- init */
 
   function bindOnce() {
@@ -544,6 +598,13 @@
       updateQtyLabel();
     });
 
+    document.querySelectorAll('[data-fol-platform]').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        state.platform = chip.dataset.folPlatform || 'whatsapp';
+        applyPlatform();
+      });
+    });
+
     document.querySelectorAll('[data-fol-qty]').forEach((chip) => {
       chip.addEventListener('click', () => {
         state.quantity = Number(chip.dataset.folQty) || 20;
@@ -553,7 +614,9 @@
     });
 
     document.getElementById('btnInspectChannel')?.addEventListener('click', () => inspectChannel(true));
-    document.getElementById('followerChannelInput')?.addEventListener('change', () => inspectChannel(false));
+    document.getElementById('followerChannelInput')?.addEventListener('change', () => {
+      if (state.platform === 'whatsapp') inspectChannel(false);
+    });
     document.getElementById('followerForm')?.addEventListener('submit', submitOrder);
     document.getElementById('btnRefreshFollowerHealth')?.addEventListener('click', () => loadHealth(true));
     document.getElementById('btnRecheckOrder')?.addEventListener('click', (e) =>
@@ -595,6 +658,7 @@
     const form = document.getElementById('followerForm');
     if (!form) return;
     bindOnce();
+    applyPlatform();
     renderHealth();
 
     try {

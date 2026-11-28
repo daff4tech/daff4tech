@@ -819,10 +819,16 @@
         <div class="follower-grid">
           <form id="followerForm" class="card main-form-card">
             <div class="step-section">
+              <div class="follower-qty-row" style="margin-bottom:14px;">
+                <button type="button" class="chip is-active" data-fol-platform="whatsapp">Saluran WhatsApp</button>
+                <button type="button" class="chip" data-fol-platform="instagram">Instagram</button>
+                <button type="button" class="chip" data-fol-platform="tiktok">TikTok</button>
+              </div>
+
               <div class="step-label-row">
                 <div class="step-title">
                   <span class="step-num">1</span>
-                  <label for="followerChannelInput">Tautan Saluran WhatsApp</label>
+                  <label for="followerChannelInput" id="followerLinkLabel">Tautan Saluran WhatsApp</label>
                 </div>
                 <button type="button" class="text-btn" id="btnInspectChannel">Cek Saluran</button>
               </div>

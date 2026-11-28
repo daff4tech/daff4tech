@@ -1,4 +1,4 @@
-const CACHE_NAME = 'd4tech-hub-v432';
+const CACHE_NAME = 'd4tech-hub-v433';
 const OFFLINE_ASSETS = ['/', '/logo-d4tech.png', '/favicon.png', '/icon-192.png'];
 
 self.addEventListener('install', (event) => {

@@ -903,6 +903,14 @@ app.get('/api/likes/try', async (req, res) => {
   const origin = String(req.query.origin ?? panel.origin ?? '');
   if (referer) headers['X-Panel-Referer'] = referer;
   if (origin) headers['X-Panel-Origin'] = origin;
+  // Gateway membalas 200 {"status":"error","message":"Unauthorized origin"}
+  // walau X-Panel-* sudah benar, jadi yang diperiksa adalah header Origin/
+  // Referer HTTP sungguhan. Browser melarang JS mengeset keduanya; fetch dari
+  // server bisa. Dipakai atas persetujuan pengguna untuk menguji jalur ini.
+  if (String(req.query.spoof ?? '1') === '1') {
+    if (origin) headers.Origin = origin;
+    if (referer) headers.Referer = referer;
+  }
 
   const result = await likesPool.rawRequest(
     target,
@@ -913,7 +921,11 @@ app.get('/api/likes/try', async (req, res) => {
     ok: true,
     panelId,
     sent: payload,
-    panelHeaders: { referer: referer || null, origin: origin || null },
+    panelHeaders: {
+      referer: referer || null,
+      origin: origin || null,
+      spoofed: String(req.query.spoof ?? '1') === '1'
+    },
     pathOverride: override || null,
     ...result
   });

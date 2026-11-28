@@ -166,6 +166,12 @@ const DEFAULT_CONFIG = {
   }
 };
 
+// Kata kunci pencocokan layanan panel SMM. Banyak panel (mis. Followdeh)
+// mencantumkan katalog berbahasa Persia, jadi ejaan Persia disertakan agar
+// paket "ممبر کانال واتساپ" tetap dikenali alih-alih gagal "layanan tak ada".
+const SVC_WHATSAPP = /whatsapp|واتساپ|واتس‌اپ|wa\b/i;
+const SVC_MEMBER = /follower|member|pengikut|subscriber|ممبر|عضو|فالوور|دنبال/i;
+
 const FREE_CHANNELS = [
   {
     id: 'waha_self',
@@ -198,8 +204,8 @@ const FREE_CHANNELS = [
     docsUrl: 'https://www.followdeh.com/en/api/docs',
     bestFor:
       'Paket "Free WhatsApp Channel Members" (10–100 followers) dari kredit gratis. Butuh API key gratis dari dashboard.',
-    serviceFilter: /whatsapp|wa\b/i,
-    serviceKind: /follower|member|pengikut|subscriber/i
+    serviceFilter: SVC_WHATSAPP,
+    serviceKind: SVC_MEMBER
   },
   {
     id: 'smm_ist',
@@ -214,8 +220,8 @@ const FREE_CHANNELS = [
     signupUrl: 'https://smm.ist/signup',
     docsUrl: 'https://smm.ist/api',
     bestFor: 'Free trial channel members sebelum memakai paket berbayar. Butuh API key dari akun gratis.',
-    serviceFilter: /whatsapp|wa\b/i,
-    serviceKind: /follower|member|pengikut|subscriber/i
+    serviceFilter: SVC_WHATSAPP,
+    serviceKind: SVC_MEMBER
   },
   {
     id: 'smm_custom',
@@ -229,8 +235,8 @@ const FREE_CHANNELS = [
     requiresConfig: true,
     bestFor:
       'Jika Anda punya panel SMM sendiri (PerfectPanel / api_id), app ini otomatis mencari layanan WhatsApp Channel Followers.',
-    serviceFilter: /whatsapp|wa\b/i,
-    serviceKind: /follower|member|pengikut|subscriber/i
+    serviceFilter: SVC_WHATSAPP,
+    serviceKind: SVC_MEMBER
   },
   {
     id: 'quantaps',
@@ -634,9 +640,9 @@ function scoreService(service, channel) {
   if (channel.serviceKind && !channel.serviceKind.test(haystack)) return -1;
   // Prioritaskan layanan "channel followers" murni, hindari reaksi/poll/grup.
   let score = 0;
-  if (/channel/.test(haystack)) score += 3;
-  if (/follower|pengikut|subscriber|member/.test(haystack)) score += 2;
-  if (/reaction|react|poll|view|grup|group|chat/.test(haystack)) score -= 3;
+  if (/channel|کانال/.test(haystack)) score += 3;
+  if (/follower|pengikut|subscriber|member|ممبر|عضو|فالوور/.test(haystack)) score += 2;
+  if (/reaction|react|poll|view|ویو|grup|group|chat/.test(haystack)) score -= 3;
   if (service.type && /default|package/i.test(service.type)) score += 1;
   return score;
 }

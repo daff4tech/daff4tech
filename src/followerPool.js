@@ -240,10 +240,12 @@ const PLATFORMS = {
     short: 'Instagram',
     serviceFilter: /instagram|اینستاگرام|اینستا|ایگ|\big\b/i,
     serviceKind: SVC_MEMBER,
-    bonus: /profile|پروفایل|پیج|page|user|کاربر/i,
+    bonus: /profile|پروفایل|user|کاربر/i,
     bonusPoints: 1,
+    // منشن = mention (bukan followers) · تیک آبی = centang biru · اکانت = jual akun
+    // · خصوصی = halaman privat. Semua itu produk lain, bukan followers profil.
     penalty:
-      /view|ویو|like|لایک|comment|کامنت|story|استوری|reels|ریلز|live|لایو|save|سیو|impression|ایمپرشن|reach|ریچ|share|اشتراک|vote|نظرسنجی/i,
+      /view|ویو|like|لایک|comment|کامنت|story|استوری|reels|ریلز|live|لایو|save|سیو|impression|ایمپرشن|reach|ریچ|share|اشتراک|vote|نظرسنجی|منشن|mention|تیک آبی|اکانت|account|خصوصی|private/i,
     example: 'https://instagram.com/namapengguna'
   },
   tiktok: {
@@ -255,7 +257,7 @@ const PLATFORMS = {
     bonus: /profile|پروفایل|user|کاربر|account|اکانت/i,
     bonusPoints: 1,
     penalty:
-      /view|ویو|like|لایک|share|اشتراک|comment|کامنت|live|لایو|download|دانلود|vote|نظرسنجی/i,
+      /view|ویو|like|لایک|share|اشتراک|comment|کامنت|live|لایو|download|دانلود|vote|نظرسنجی|منشن|mention|تیک آبی|اکانت|account|خصوصی|private/i,
     example: 'https://tiktok.com/@namapengguna'
   }
 };
@@ -726,6 +728,13 @@ function normalizeServiceList(payload) {
     .filter((s) => s.id && s.name);
 }
 
+// Buang klausa "bonus gratis" sebelum menguji penalti. Katalog Persia sering
+// menulis "… + هدیه لایک رایگان" (bonus likes gratis) pada layanan followers
+// yang sah; tanpa ini layanan itu kena penalti 'like' dan tersingkir.
+function stripGiftClause(haystack) {
+  return haystack.replace(/هدیه[^،,|]*/g, ' ');
+}
+
 function scoreService(service, channel, platform = 'whatsapp') {
   const pf = platformById(platform) || PLATFORMS.whatsapp;
   const haystack = `${service.name} ${service.category}`.toLowerCase();
@@ -739,7 +748,7 @@ function scoreService(service, channel, platform = 'whatsapp') {
   let score = 0;
   if (pf.bonus && pf.bonus.test(haystack)) score += pf.bonusPoints;
   if (/follower|pengikut|subscriber|member|ممبر|عضو|فالوور/.test(haystack)) score += 2;
-  if (pf.penalty && pf.penalty.test(haystack)) score -= 3;
+  if (pf.penalty && pf.penalty.test(stripGiftClause(haystack))) score -= 3;
   if (service.type && /default|package/i.test(service.type)) score += 1;
   return score;
 }
@@ -1030,12 +1039,20 @@ async function placeFollowerOrder({
     );
   }
 
-  // Baca jumlah awal hanya untuk Saluran WhatsApp; Instagram/TikTok tidak
-  // punya halaman og yang bisa dibaca tanpa login, jadi lewati saja.
+  // Baca jumlah awal hanya untuk Saluran WhatsApp. Instagram/TikTok tidak
+  // punya halaman og yang terbaca tanpa login, jadi pakai objek netral supaya
+  // setiap pembaca di hilir tetap mendapat bentuk data yang sama.
+  const EMPTY_PROBE = {
+    exists: false,
+    name: null,
+    followersNumber: null,
+    followersText: null,
+    avatar: null
+  };
   const before =
     platform === 'whatsapp'
       ? await probePublicChannel(parsed.channelCode, { timeoutMs: 9000 })
-      : null;
+      : { ...EMPTY_PROBE };
 
   let success = null;
   let lastError = null;
@@ -1109,9 +1126,12 @@ async function placeFollowerOrder({
     );
   }
 
-  // Jeda singkat lalu baca ulang halaman publik sebagai bukti
-  await sleep(1200);
-  let after = await probePublicChannel(parsed.channelCode, { timeoutMs: 9000, force: true });
+  // Jeda singkat lalu baca ulang halaman publik sebagai bukti (WhatsApp saja)
+  let after = { ...EMPTY_PROBE };
+  if (platform === 'whatsapp') {
+    await sleep(1200);
+    after = await probePublicChannel(parsed.channelCode, { timeoutMs: 9000, force: true });
+  }
 
   const delta =
     before.followersNumber !== null && after.followersNumber !== null
@@ -1140,8 +1160,9 @@ async function placeFollowerOrder({
   const order = recordOrder({
     id: store.generateId('fol'),
     createdAt: new Date().toISOString(),
-    target: parsed.channelUrl,
-    channelCode: parsed.channelCode,
+    platform,
+    target: parsed.targetUrl || parsed.channelUrl,
+    channelCode: parsed.channelCode || parsed.handle,
     channelId: success.channelId,
     channelName: success.channelName,
     realChannelName: before.name || success.channelName || null,
@@ -1192,7 +1213,11 @@ async function refreshOrder(orderId) {
   const order = store.data.followerOrders.find((o) => o.id === orderId);
   if (!order) throw new Error('Riwayat order tidak ditemukan.');
 
-  const after = await probePublicChannel(order.channelCode, { timeoutMs: 9000, force: true });
+  // Bukti jumlah pengikut hanya bisa dibaca untuk Saluran WhatsApp.
+  const after =
+    (order.platform || 'whatsapp') === 'whatsapp'
+      ? await probePublicChannel(order.channelCode, { timeoutMs: 9000, force: true })
+      : { exists: false, name: null, followersNumber: null, followersText: null, avatar: null };
   const base = order.proof?.before ?? null;
   const next = after.followersNumber;
   const delta = base !== null && next !== null ? next - base : null;

@@ -1457,6 +1457,7 @@ async function listPanelServices(channelId, options = {}) {
     return true;
   });
 
+  const scoped = qRe.length > 0 || freeOnly;
   return {
     channelId,
     channelName: def.name,
@@ -1467,12 +1468,13 @@ async function listPanelServices(channelId, options = {}) {
     freeServicesInCatalog: withScore.filter(
       (s) => Number(s.rate) === 0 || FREE_RE.test(`${s.name} ${s.category}`)
     ).length,
+    rateZeroServices: withScore.filter((s) => Number(s.rate) === 0).length,
     totalServices: services.length,
     matchedServices: withScore.filter((s) => s.score >= 0).length,
     matchedCount: filtered.length,
     matches: filtered.slice(0, 60).map(brief),
-    whatsappRelated: waRelated.map(brief),
-    top: withScore.slice(0, 30).map(brief)
+    // Field lama hanya untuk kueri tanpa penyaring, agar respons tetap ramping.
+    ...(scoped ? {} : { whatsappRelated: waRelated.map(brief), top: withScore.slice(0, 30).map(brief) })
   };
 }
 

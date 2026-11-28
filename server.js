@@ -730,7 +730,8 @@ app.get('/api/followers/services', async (req, res) => {
     const channelId = String(req.query.channel || 'followdeh');
     const result = await followerPool.listPanelServices(channelId, {
       q: req.query.q,
-      free: req.query.free
+      free: req.query.free,
+      platform: req.query.platform
     });
     res.json({ ok: true, ...result });
   } catch (err) {
@@ -784,6 +785,7 @@ app.post('/api/followers/order', async (req, res) => {
   try {
     const result = await followerPool.placeFollowerOrder({
       channelLink: req.body?.link,
+      platform: req.body?.platform || 'whatsapp',
       quantity: req.body?.quantity,
       channelId: req.body?.channelId || 'auto',
       note: req.body?.note

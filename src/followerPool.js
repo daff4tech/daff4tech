@@ -41,6 +41,50 @@ const GROUP_LINK_REGEX = /chat\.whatsapp\.com\//i;
  * Terima link saluran (dengan/tanpa http, dengan/tanpa postingan) atau kode
  * invite mentah. Menolak link grup / chat pribadi dengan pesan yang jelas.
  */
+// Tautan target untuk Instagram / TikTok. WhatsApp tetap lewat
+// parseChannelLink karena punya aturan tautan & kode invite sendiri.
+function parseSocialLink(rawInput, platform) {
+  const pf = platformById(platform);
+  if (!pf) throw new Error(`Platform "${platform}" tidak dikenali.`);
+  const raw = String(rawInput || '').trim();
+  if (!raw) throw new Error(`Tempel tautan ${pf.label} atau username-nya (contoh: ${pf.example}).`);
+
+  const hostRe = new RegExp(
+    `^(?:https?:\\/\\/)?(?:www\\.)?(${platform}\\.com)\\/@?([A-Za-z0-9._]{1,40})`,
+    'i'
+  );
+  const m = raw.match(hostRe);
+  if (m) {
+    const handle = m[2];
+    return {
+      platform,
+      handle,
+      targetUrl: platform === 'tiktok' ? `https://tiktok.com/@${handle}` : `https://instagram.com/${handle}`
+    };
+  }
+
+  const bare = raw.replace(/^@/, '');
+  if (/^[A-Za-z0-9._]{2,40}$/.test(bare)) {
+    return {
+      platform,
+      handle: bare,
+      targetUrl: platform === 'tiktok' ? `https://tiktok.com/@${bare}` : `https://instagram.com/${bare}`
+    };
+  }
+
+  throw new Error(
+    `Tautan itu tidak terbaca sebagai ${pf.label}. Pakai ${pf.example} atau username polos seperti @namapengguna.`
+  );
+}
+
+function parseTargetLink(rawInput, platform = 'whatsapp') {
+  if (platform === 'whatsapp') {
+    const wa = parseChannelLink(rawInput);
+    return { platform: 'whatsapp', handle: wa.channelCode, targetUrl: wa.channelUrl, ...wa };
+  }
+  return parseSocialLink(rawInput, platform);
+}
+
 function parseChannelLink(rawInput) {
   const raw = String(rawInput || '').trim();
   if (!raw) {
@@ -174,6 +218,51 @@ const DEFAULT_CONFIG = {
 // adalah akarnya ("واتس"), bukan satu ejaan utuh.
 const SVC_WHATSAPP = /whatsapp|واتس|wa\b/i;
 const SVC_MEMBER = /follower|member|pengikut|subscriber|ممبر|عضو|فالوور|دنبال/i;
+
+// Katalog panel berbahasa Persia & Inggris. Tiap platform punya penyaring
+// namanya sendiri supaya order Instagram tidak nyasar ke layanan WhatsApp.
+const PLATFORMS = {
+  whatsapp: {
+    id: 'whatsapp',
+    label: 'Saluran WhatsApp',
+    short: 'WhatsApp',
+    serviceFilter: SVC_WHATSAPP,
+    serviceKind: SVC_MEMBER,
+    bonus: /channel|کانال/i,
+    bonusPoints: 3,
+    penalty:
+      /reaction|react|poll|view|ویو|grup|group|chat|گروه|اکشن|نظرسنجی|پیام|دایرکت/i,
+    example: 'https://whatsapp.com/channel/0029Va4K…'
+  },
+  instagram: {
+    id: 'instagram',
+    label: 'Profil Instagram',
+    short: 'Instagram',
+    serviceFilter: /instagram|اینستاگرام|اینستا|ایگ|\big\b/i,
+    serviceKind: SVC_MEMBER,
+    bonus: /profile|پروفایل|پیج|page|user|کاربر/i,
+    bonusPoints: 1,
+    penalty:
+      /view|ویو|like|لایک|comment|کامنت|story|استوری|reels|ریلز|live|لایو|save|سیو|impression|ایمپرشن|reach|ریچ|share|اشتراک|vote|نظرسنجی/i,
+    example: 'https://instagram.com/namapengguna'
+  },
+  tiktok: {
+    id: 'tiktok',
+    label: 'Profil TikTok',
+    short: 'TikTok',
+    serviceFilter: /tik\s?tok|تیک\s?تاک|تیک‌تاک/i,
+    serviceKind: SVC_MEMBER,
+    bonus: /profile|پروفایل|user|کاربر|account|اکانت/i,
+    bonusPoints: 1,
+    penalty:
+      /view|ویو|like|لایک|share|اشتراک|comment|کامنت|live|لایو|download|دانلود|vote|نظرسنجی/i,
+    example: 'https://tiktok.com/@namapengguna'
+  }
+};
+
+function platformById(id) {
+  return PLATFORMS[id] || null;
+}
 
 const FREE_CHANNELS = [
   {
@@ -637,17 +726,20 @@ function normalizeServiceList(payload) {
     .filter((s) => s.id && s.name);
 }
 
-function scoreService(service, channel) {
+function scoreService(service, channel, platform = 'whatsapp') {
+  const pf = platformById(platform) || PLATFORMS.whatsapp;
   const haystack = `${service.name} ${service.category}`.toLowerCase();
-  if (channel.serviceFilter && !channel.serviceFilter.test(haystack)) return -1;
-  if (channel.serviceKind && !channel.serviceKind.test(haystack)) return -1;
-  // Prioritaskan layanan "channel followers" murni, hindari reaksi/poll/grup.
+  // Penyaring platform menang atas penyaring kanal: satu panel SMM melayani
+  // banyak platform, jadi yang menentukan adalah target yang diminta pengguna.
+  const filter = pf.serviceFilter || channel.serviceFilter;
+  const kind = pf.serviceKind || channel.serviceKind;
+  if (filter && !filter.test(haystack)) return -1;
+  if (kind && !kind.test(haystack)) return -1;
+  // Prioritaskan layanan followers murni, hindari reaksi/poll/view/DM.
   let score = 0;
-  if (/channel|کانال/.test(haystack)) score += 3;
+  if (pf.bonus && pf.bonus.test(haystack)) score += pf.bonusPoints;
   if (/follower|pengikut|subscriber|member|ممبر|عضو|فالوور/.test(haystack)) score += 2;
-  if (/reaction|react|poll|view|ویو|grup|group|chat|گروه|اکشن|نظرسنجی|پیام|دایرکت/.test(haystack)) {
-    score -= 3;
-  }
+  if (pf.penalty && pf.penalty.test(haystack)) score -= 3;
   if (service.type && /default|package/i.test(service.type)) score += 1;
   return score;
 }
@@ -687,23 +779,24 @@ async function smmFetchServices(apiUrl, apiKey, extra = {}, timeoutMs = 20000) {
   return services;
 }
 
-async function smmPickService(channel, apiKey, extra = {}) {
+async function smmPickService(channel, apiKey, extra = {}, platform = 'whatsapp') {
+  const pf = platformById(platform) || PLATFORMS.whatsapp;
   const services = await smmFetchServices(channel.apiUrl, apiKey, extra);
   const scored = services
-    .map((s) => ({ ...s, score: scoreService(s, channel) }))
+    .map((s) => ({ ...s, score: scoreService(s, channel, platform) }))
     .filter((s) => s.score >= 0)
     .sort((a, b) => b.score - a.score || a.rate - b.rate);
 
   if (scored.length === 0) {
     const sample = services.slice(0, 6).map((s) => s.name).join(' | ');
     throw new Error(
-      `Panel ini tidak menemukan layanan WhatsApp Channel Followers di katalognya. Contoh layanan yang ada: ${sample}`
+      `Panel ini tidak menemukan layanan ${pf.label} di katalognya. Contoh layanan yang ada: ${sample}`
     );
   }
   return { best: scored[0], all: scored };
 }
 
-async function followViaSmm(channel, apiKey, parsed, quantity, extra = {}) {
+async function followViaSmm(channel, apiKey, parsed, quantity, extra = {}, platform = 'whatsapp') {
   if (!channel.apiUrl) throw new Error('URL API panel belum diatur.');
   if (!apiKey) throw new Error('API key panel belum diisi di Konfigurasi.');
 
@@ -724,8 +817,8 @@ async function followViaSmm(channel, apiKey, parsed, quantity, extra = {}) {
     /* panel mungkin tidak punya action balance — lanjut */
   }
 
-  // 2. Cari layanan WhatsApp Channel Followers yang paling relevan
-  const { best, all } = await smmPickService(channel, apiKey, extra);
+  // 2. Cari layanan platform yang diminta, yang paling relevan & termurah
+  const { best, all } = await smmPickService(channel, apiKey, extra, platform);
   const min = best.min || 1;
   const max = best.max || 100000;
   const qty = Math.min(max, Math.max(min, Math.floor(quantity)));
@@ -737,7 +830,7 @@ async function followViaSmm(channel, apiKey, parsed, quantity, extra = {}) {
       key: apiKey,
       action: 'add',
       service: best.id,
-      link: parsed.channelUrl,
+      link: parsed.targetUrl || parsed.channelUrl,
       quantity: qty,
       ...extra
     },
@@ -858,11 +951,11 @@ function clearOrders() {
  * Memilih jalur otomatis (failover): urutan = panel SMM yang sudah berkey
  * (paling andal) → WAHA mandiri → WAHA publik → error informatif.
  */
-function autoPriority(rt) {
-  // Urutan: WAHA mandiri (paling murah & tanpa limit) → panel ber-kredit
-  // gratis → panel langganan milik pengguna.
+function autoPriority(rt, platform = 'whatsapp') {
+  // Urutan: WAHA mandiri (paling murah & tanpa limit) → panel SMM.
+  // WAHA hanya bisa WhatsApp, jadi dilewati untuk platform lain.
   const list = [];
-  if (rt.wahaSelf.baseUrl) list.push('waha_self');
+  if (platform === 'whatsapp' && rt.wahaSelf.baseUrl) list.push('waha_self');
   if (rt.followdehKey) list.push('followdeh');
   if (rt.smmIstKey) list.push('smm_ist');
   if (rt.customSmm.apiUrl && rt.customSmm.apiKey) list.push('smm_custom');
@@ -898,17 +991,25 @@ function describeMissingPaths(rt) {
 
 async function placeFollowerOrder({
   channelLink,
+  targetLink,
+  platform = 'whatsapp',
   quantity = 20,
   channelId = 'auto',
   note = ''
 }) {
-  const parsed = parseChannelLink(channelLink);
+  const pf = platformById(platform);
+  if (!pf) {
+    throw new Error(
+      `Platform "${platform}" tidak dikenali. Pilih salah satu: ${Object.keys(PLATFORMS).join(', ')}.`
+    );
+  }
+  const parsed = parseTargetLink(targetLink || channelLink, platform);
   const qty = clampQuantity(quantity);
   const rt = runtimeConfig();
 
   const attempts = [];
   const candidates =
-    channelId && channelId !== 'auto' ? [channelId] : autoPriority(rt);
+    channelId && channelId !== 'auto' ? [channelId] : autoPriority(rt, platform);
 
   // Mode otomatis tanpa satu pun jalur terkonfigurasi: jangan berpura-pura
   // sudah mencoba. Beri tahu pengguna apa yang harus diisi. Divalidasi SEBELUM
@@ -929,7 +1030,12 @@ async function placeFollowerOrder({
     );
   }
 
-  const before = await probePublicChannel(parsed.channelCode, { timeoutMs: 9000 });
+  // Baca jumlah awal hanya untuk Saluran WhatsApp; Instagram/TikTok tidak
+  // punya halaman og yang bisa dibaca tanpa login, jadi lewati saja.
+  const before =
+    platform === 'whatsapp'
+      ? await probePublicChannel(parsed.channelCode, { timeoutMs: 9000 })
+      : null;
 
   let success = null;
   let lastError = null;
@@ -966,7 +1072,7 @@ async function placeFollowerOrder({
         if (!apiKey) {
           throw new Error('API key panel belum diisi.');
         }
-        const res = await followViaSmm(channel, apiKey, parsed, qty, smmExtraFor(id, rt));
+        const res = await followViaSmm(channel, apiKey, parsed, qty, smmExtraFor(id, rt), platform);
         success = {
           channelId: id,
           channelName: def.name,
@@ -1424,8 +1530,9 @@ async function listPanelServices(channelId, options = {}) {
   }
 
   const services = await smmFetchServices(apiUrl, apiKey, smmExtraFor(channelId, rt), 20000);
+  const platform = platformById(options.platform) ? options.platform : 'whatsapp';
   const withScore = services
-    .map((s) => ({ ...s, score: scoreService(s, { ...def, apiUrl }) }))
+    .map((s) => ({ ...s, score: scoreService(s, { ...def, apiUrl }, platform) }))
     .sort((a, b) => b.score - a.score || a.rate - b.rate);
 
   const brief = (s) => ({
@@ -1463,6 +1570,7 @@ async function listPanelServices(channelId, options = {}) {
     channelName: def.name,
     apiUrl,
     balance,
+    platform,
     query: q || undefined,
     freeOnly: freeOnly || undefined,
     freeServicesInCatalog: withScore.filter(
@@ -1484,6 +1592,15 @@ module.exports = {
 
   getPublicConfig,
   parseChannelLink,
+  parseTargetLink,
+  listPlatforms: () =>
+    Object.values(PLATFORMS).map((p) => ({
+      id: p.id,
+      label: p.label,
+      short: p.short,
+      example: p.example
+    })),
+  platformById,
   parseFollowerText,
   probePublicChannel,
   placeFollowerOrder,

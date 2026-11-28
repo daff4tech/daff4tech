@@ -883,8 +883,21 @@ app.get('/api/likes/try', async (req, res) => {
       return res.status(400).json({ ok: false, error: 'payload bukan JSON yang valid.' });
     }
   }
+  // Opsional: timpa path-nya saja. Host tetap terkunci ke origin panel, jadi
+  // ini tidak bisa dipakai menembak situs lain. Perlu karena galat 404
+  // "This free service is not available." tidak berubah walau field ditambah,
+  // yang mengarah ke dugaan bahwa layanan dipilih lewat segmen path.
+  let target = panel.apiUrl;
+  const override = String(req.query.path || '').trim();
+  if (override) {
+    if (!override.startsWith('/')) {
+      return res.status(400).json({ ok: false, error: 'path harus diawali "/".' });
+    }
+    target = new URL(panel.apiUrl).origin + override;
+  }
+
   const result = await likesPool.rawRequest(
-    panel.apiUrl,
+    target,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -893,7 +906,7 @@ app.get('/api/likes/try', async (req, res) => {
     },
     15000
   );
-  res.json({ ok: true, panelId, sent: payload, ...result });
+  res.json({ ok: true, panelId, sent: payload, pathOverride: override || null, ...result });
 });
 
 // Ambil halaman panel lalu HANYA kembalikan potongan yang cocok regex.

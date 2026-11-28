@@ -830,6 +830,72 @@ app.get('/api/likes/probe', async (req, res) => {
   }
 });
 
+// Host yang boleh dijangkau alat diagnostik. Ini BUKAN proxy umum: daftar
+// putih sengaja sempit supaya endpoint tidak bisa dipakai menembak situs lain.
+const LIKES_PROBE_HOSTS = ['profollowers.uk', 'nicesmmpanel.com'];
+
+function assertProbeHost(rawUrl) {
+  let parsed;
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    return { error: 'URL tidak valid.' };
+  }
+  const host = parsed.hostname.replace(/^www\./, '');
+  const allowed = LIKES_PROBE_HOSTS.some((h) => host === h || host.endsWith(`.${h}`));
+  if (!allowed) {
+    return {
+      error: `Host "${parsed.hostname}" tidak diizinkan. Hanya: ${LIKES_PROBE_HOSTS.join(', ')}.`
+    };
+  }
+  return { parsed };
+}
+
+// Baca halaman/JS panel lewat deployment (sandbox tidak bisa menjangkau domain
+// ini). Dipakai untuk menemukan bentuk payload yang dikirim frontend-nya.
+app.get('/api/likes/fetch', async (req, res) => {
+  const target = String(req.query.url || '');
+  const check = assertProbeHost(target);
+  if (check.error) return res.status(400).json({ ok: false, error: check.error });
+  const result = await likesPool.rawRequest(
+    target,
+    { previewChars: Math.min(Number(req.query.chars) || 8000, 20000) },
+    15000
+  );
+  res.json({ ok: true, ...result });
+});
+
+// Kirim satu payload JSON ke panel dan kembalikan balasan mentahnya, supaya
+// field wajib bisa ditemukan dari pesan galat server - bukan dari tebakan.
+app.get('/api/likes/try', async (req, res) => {
+  const panelId = String(req.query.panel || 'profollowers');
+  const panel = likesPool.LIKE_PANELS[panelId];
+  if (!panel) {
+    return res
+      .status(400)
+      .json({ ok: false, error: `Panel "${panelId}" tidak dikenali.` });
+  }
+  let payload = {};
+  if (req.query.payload) {
+    try {
+      payload = JSON.parse(String(req.query.payload));
+    } catch {
+      return res.status(400).json({ ok: false, error: 'payload bukan JSON yang valid.' });
+    }
+  }
+  const result = await likesPool.rawRequest(
+    panel.apiUrl,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      previewChars: 1500
+    },
+    15000
+  );
+  res.json({ ok: true, panelId, sent: payload, ...result });
+});
+
 // Pastikan seluruh endpoint /api/* selalu mengembalikan JSON (bukan HTML)
 app.all('/api/*', (req, res) => {
   res.status(404).json({

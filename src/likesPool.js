@@ -57,6 +57,7 @@ async function rawRequest(url, options = {}, timeoutMs = 15000) {
         ...(options.headers || {})
       }
     });
+    const previewChars = Number(options.previewChars) || 700;
     const text = await res.text();
     let json = null;
     try {
@@ -73,7 +74,7 @@ async function rawRequest(url, options = {}, timeoutMs = 15000) {
       ms: Date.now() - started,
       isJson: json !== null,
       json,
-      bodyPreview: text.slice(0, 700),
+      bodyPreview: text.slice(0, previewChars),
       bodyLength: text.length
     };
   } catch (err) {

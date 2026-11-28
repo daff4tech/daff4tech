@@ -944,6 +944,9 @@ app.get('/api/likes/discover', async (req, res) => {
     if (m.index === re.lastIndex) re.lastIndex++;
   }
 
+  // Perantara pembaca halaman terbukti menghapus isi kecocokan yang berisi
+  // tanda kutip, jadi sediakan bentuk base64 yang tidak bisa dipangkas.
+  const encode = String(req.query.enc || '') === '1';
   res.json({
     ok: true,
     url: target,
@@ -951,7 +954,8 @@ app.get('/api/likes/discover', async (req, res) => {
     bytes: full.length,
     pattern,
     matchCount: matches.length,
-    matches
+    encoding: encode ? 'base64' : 'plain',
+    matches: encode ? matches.map((t) => Buffer.from(t, 'utf8').toString('base64')) : matches
   });
 });
 

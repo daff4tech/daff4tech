@@ -1399,7 +1399,7 @@ async function getWahaStatus() {
  * dikenali — supaya nama layanan asli terlihat dan pencocokan bisa disesuaikan,
  * bukan ditebak.
  */
-async function listPanelServices(channelId) {
+async function listPanelServices(channelId, options = {}) {
   const rt = runtimeConfig();
   const def = publicChannelById(channelId);
   if (!def) throw new Error(`Jalur "${channelId}" tidak dikenali.`);
@@ -1443,13 +1443,34 @@ async function listPanelServices(channelId) {
     /whatsapp|واتساپ|واتس|\bwa\b/i.test(`${s.name} ${s.category}`)
   );
 
+  // Penyaring diagnostik: kata kunci bebas (q) dan/atau hanya yang gratis.
+  // "Gratis" = tarif 0 atau namanya menandai diri sebagai sampel gratis.
+  const q = String(options.q || '').trim().toLowerCase();
+  const qRe = q ? q.split(/\s+/).map((w) => new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')) : [];
+  const FREE_RE = /رایگان|\bfree\b|\btrial\b|نمونه|🆓|هدیه|هدایا/i;
+  const freeOnly = options.free === true || options.free === '1' || options.free === 'true';
+
+  const filtered = withScore.filter((s) => {
+    const text = `${s.name} ${s.category}`;
+    if (qRe.length && !qRe.every((re) => re.test(text))) return false;
+    if (freeOnly && !(Number(s.rate) === 0 || FREE_RE.test(text))) return false;
+    return true;
+  });
+
   return {
     channelId,
     channelName: def.name,
     apiUrl,
     balance,
+    query: q || undefined,
+    freeOnly: freeOnly || undefined,
+    freeServicesInCatalog: withScore.filter(
+      (s) => Number(s.rate) === 0 || FREE_RE.test(`${s.name} ${s.category}`)
+    ).length,
     totalServices: services.length,
     matchedServices: withScore.filter((s) => s.score >= 0).length,
+    matchedCount: filtered.length,
+    matches: filtered.slice(0, 60).map(brief),
     whatsappRelated: waRelated.map(brief),
     top: withScore.slice(0, 30).map(brief)
   };

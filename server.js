@@ -728,7 +728,10 @@ app.get('/api/followers/health', async (req, res) => {
 app.get('/api/followers/services', async (req, res) => {
   try {
     const channelId = String(req.query.channel || 'followdeh');
-    const result = await followerPool.listPanelServices(channelId);
+    const result = await followerPool.listPanelServices(channelId, {
+      q: req.query.q,
+      free: req.query.free
+    });
     res.json({ ok: true, ...result });
   } catch (err) {
     res.status(400).json({ ok: false, error: err.message });

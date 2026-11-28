@@ -832,7 +832,15 @@ app.get('/api/likes/probe', async (req, res) => {
 
 // Host yang boleh dijangkau alat diagnostik. Ini BUKAN proxy umum: daftar
 // putih sengaja sempit supaya endpoint tidak bisa dipakai menembak situs lain.
-const LIKES_PROBE_HOSTS = ['profollowers.uk', 'nicesmmpanel.com', 'test.socialfruit.co'];
+const LIKES_PROBE_HOSTS = [
+  'profollowers.uk',
+  'nicesmmpanel.com',
+  'test.socialfruit.co',
+  // smm8: 100 likes IG gratis per 30 menit, tanpa email/pendaftaran.
+  // Registry menandainya profil "self" karena ordernya baru dibuat saat timer
+  // habis - bukan karena IP ditolak - jadi layak diuji dari datacenter.
+  'smm8.com'
+];
 
 function assertProbeHost(rawUrl) {
   let parsed;
@@ -869,11 +877,13 @@ app.get('/api/likes/fetch', async (req, res) => {
 // field wajib bisa ditemukan dari pesan galat server - bukan dari tebakan.
 app.get('/api/likes/try', async (req, res) => {
   const panelId = String(req.query.panel || 'profollowers');
-  const panel = likesPool.LIKE_PANELS[panelId];
+  const panel =
+    likesPool.LIKE_PANELS[panelId] ||
+    (panelId === 'custom' ? { id: 'custom', apiUrl: '', referer: '', origin: '' } : null);
   if (!panel) {
     return res
       .status(400)
-      .json({ ok: false, error: `Panel "${panelId}" tidak dikenali.` });
+      .json({ ok: false, error: `Panel "${panelId}" tidak dikenali. Pakai "custom" bersama ?url=.` });
   }
   let payload = {};
   if (req.query.payload) {
@@ -888,6 +898,14 @@ app.get('/api/likes/try', async (req, res) => {
   // "This free service is not available." tidak berubah walau field ditambah,
   // yang mengarah ke dugaan bahwa layanan dipilih lewat segmen path.
   let target = panel.apiUrl;
+  // ?url= menunjuk endpoint lain, mis. form action yang baru ditemukan.
+  // Tetap wajib lolos daftar putih host, jadi tidak bisa diarahkan sembarangan.
+  const explicitUrl = String(req.query.url || '').trim();
+  if (explicitUrl) {
+    const hostCheck = assertProbeHost(explicitUrl);
+    if (hostCheck.error) return res.status(400).json({ ok: false, error: hostCheck.error });
+    target = explicitUrl;
+  }
   const override = String(req.query.path || '').trim();
   if (override) {
     if (!override.startsWith('/')) {

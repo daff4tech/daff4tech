@@ -2956,6 +2956,13 @@ body {
   margin-top: 0.35rem;
 }
 
+.follower-error {
+  white-space: pre-line;
+  text-align: left;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
 .follower-pair-code {
   font-family: var(--font-mono);
   font-size: 1.5rem;

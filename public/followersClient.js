@@ -401,9 +401,11 @@
       }
     } catch (err) {
       if (box) {
-        box.innerHTML = `<div class="empty-box" style="color:var(--danger);">${esc(err.message)}</div>`;
+        // Pesan galat dari server berbentuk daftar bertingkat; tampilkan apa
+        // adanya agar pengguna tahu jalur mana yang gagal dan apa yang kurang.
+        box.innerHTML = `<div class="empty-box follower-error" style="color:var(--danger);">${esc(err.message)}</div>`;
       }
-      toast?.(err.message, 'error');
+      toast?.(String(err.message).split('\n')[0], 'error');
     } finally {
       if (btn) {
         btn.disabled = false;

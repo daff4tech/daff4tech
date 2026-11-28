@@ -843,6 +843,33 @@ function autoPriority(rt) {
   return list;
 }
 
+/**
+ * Daftar jalur yang BELUM dikonfigurasi, dalam bahasa manusia. Dipakai supaya
+ * pesan galat menjelaskan apa yang harus diisi — bukan menyalahkan server.
+ */
+function describeMissingPaths(rt) {
+  const items = [];
+  if (!rt.wahaSelf.baseUrl) {
+    items.push(
+      'WAHA mandiri (100% gratis, tanpa limit): jalankan container Docker WAHA, lalu isi Base URL-nya di panel Konfigurasi.'
+    );
+  }
+  if (!rt.followdehKey) {
+    items.push(
+      'Followdeh (kredit gratis tiap 30 menit): daftar gratis di https://www.followdeh.com/auth/signup lalu tempel API key-nya.'
+    );
+  }
+  if (!rt.smmIstKey) {
+    items.push(
+      'SMM.ist (saldo trial gratis): daftar gratis di https://smm.ist/signup lalu tempel API key-nya.'
+    );
+  }
+  if (!(rt.customSmm.apiUrl && rt.customSmm.apiKey)) {
+    items.push('Panel SMM milik Anda: isi URL API + API key panel di Konfigurasi.');
+  }
+  return items;
+}
+
 async function placeFollowerOrder({
   channelLink,
   quantity = 20,
@@ -853,11 +880,30 @@ async function placeFollowerOrder({
   const qty = clampQuantity(quantity);
   const rt = runtimeConfig();
 
-  const before = await probePublicChannel(parsed.channelCode, { timeoutMs: 9000 });
-
   const attempts = [];
   const candidates =
     channelId && channelId !== 'auto' ? [channelId] : autoPriority(rt);
+
+  // Mode otomatis tanpa satu pun jalur terkonfigurasi: jangan berpura-pura
+  // sudah mencoba. Beri tahu pengguna apa yang harus diisi. Divalidasi SEBELUM
+  // probe jaringan supaya pengguna tidak menunggu 9 detik sia-sia.
+  if (!channelId || channelId === 'auto') {
+    if (!candidates.length) {
+      const missing = describeMissingPaths(rt);
+      throw new Error(
+        'Belum ada jalur yang siap dipakai, jadi tidak ada permintaan yang dikirim. ' +
+          'Isi salah satu dari ini di panel Konfigurasi:\n' +
+          missing.map((m, i) => `${i + 1}. ${m}`).join('\n') +
+          '\n\nAlternatif tanpa API key: buka form gratis Quantaps (1–25 followers per permintaan) lewat tombol "Buka →" di daftar jalur.'
+      );
+    }
+  } else if (!publicChannelById(channelId)) {
+    throw new Error(
+      `Jalur "${channelId}" tidak dikenali. Pilih "Mode Otomatis" atau salah satu jalur yang terdaftar.`
+    );
+  }
+
+  const before = await probePublicChannel(parsed.channelCode, { timeoutMs: 9000 });
 
   let success = null;
   let lastError = null;
@@ -910,12 +956,24 @@ async function placeFollowerOrder({
   }
 
   if (!success) {
+    // Jelaskan kegagalan tiap jalur apa adanya, tanpa menyalahkan server bila
+    // penyebabnya sebenarnya konfigurasi yang belum lengkap.
     const detail = attempts
-      .map((a) => `${a.channelId}: ${a.error || 'tidak tersedia'}`)
-      .join(' | ');
+      .map((a) => {
+        const name = publicChannelById(a.channelId)?.name || a.channelId;
+        return `• ${name}: ${a.error || 'tidak tersedia'}`;
+      })
+      .join('\n');
+
+    const missing = describeMissingPaths(rt);
+    const suffix = missing.length
+      ? `\n\nJalur lain yang bisa dipakai setelah diatur:\n${missing
+          .map((m, i) => `${i + 1}. ${m}`)
+          .join('\n')}`
+      : '';
+
     throw new Error(
-      `Tidak ada jalur gratis yang berhasil. ${detail}. ` +
-        'Jika server relay publik sedang penuh, isi API key gratis Followdeh/SMM.ist atau jalankan WAHA mandiri di Konfigurasi.'
+      `${attempts.length} jalur dicoba, semuanya gagal:\n${detail}${suffix}`
     );
   }
 

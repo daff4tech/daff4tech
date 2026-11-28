@@ -896,6 +896,52 @@ app.get('/api/likes/try', async (req, res) => {
   res.json({ ok: true, panelId, sent: payload, ...result });
 });
 
+// Ambil halaman panel lalu HANYA kembalikan potongan yang cocok regex.
+// Perlu karena perantara pembaca halaman memangkas HTML mentah, jadi
+// penyaringan harus terjadi di server.
+app.get('/api/likes/discover', async (req, res) => {
+  const target = String(req.query.url || '');
+  const check = assertProbeHost(target);
+  if (check.error) return res.status(400).json({ ok: false, error: check.error });
+
+  const result = await likesPool.rawRequest(target, {}, 15000);
+  if (result.status === 0 || !result.bodyPreview) {
+    return res.json({ ok: true, url: target, status: result.status, error: result.error || 'tubuh kosong' });
+  }
+  // rawRequest memotong tubuh; untuk penemuan kita perlu teks utuh, jadi ambil ulang.
+  const full = await (await fetch(target, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/131.0.0.0' }
+  })).text();
+
+  const pattern = String(req.query.grep || 'api/|free|trial|likes');
+  let re;
+  try {
+    re = new RegExp(pattern, 'gi');
+  } catch {
+    return res.status(400).json({ ok: false, error: 'grep bukan regex yang valid.' });
+  }
+
+  const limit = Math.min(Number(req.query.max) || 25, 60);
+  const width = Math.min(Number(req.query.width) || 150, 300);
+  const matches = [];
+  let m;
+  while ((m = re.exec(full)) !== null && matches.length < limit) {
+    const from = Math.max(0, m.index - Math.floor(width / 3));
+    matches.push(full.slice(from, m.index + width).replace(/\s+/g, ' '));
+    if (m.index === re.lastIndex) re.lastIndex++;
+  }
+
+  res.json({
+    ok: true,
+    url: target,
+    status: result.status,
+    bytes: full.length,
+    pattern,
+    matchCount: matches.length,
+    matches
+  });
+});
+
 // Pastikan seluruh endpoint /api/* selalu mengembalikan JSON (bukan HTML)
 app.all('/api/*', (req, res) => {
   res.status(404).json({
